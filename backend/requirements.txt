@@ -4,3 +4,4 @@ sqlmodel>=0.0.22
 pydantic-settings>=2.4
 pyjwt>=2.9
 argon2-cffi>=23.1
+email-validator>=2.1
