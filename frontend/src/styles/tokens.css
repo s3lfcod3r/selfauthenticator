@@ -1,0 +1,60 @@
+/* ============================================================
+   SELF DESIGN SYSTEM — Design Tokens (aus brand-kit/tokens.css)
+   ============================================================ */
+:root {
+  --self-bg-0: #080c11;
+  --self-bg-1: #0d1117;
+  --self-bg-2: #161b22;
+  --self-bg-3: #1c2333;
+
+  --self-line: rgba(157, 189, 208, 0.10);
+  --self-line-strong: rgba(157, 189, 208, 0.22);
+
+  --self-teal: #33a78c;
+  --self-teal-bright: #43d3ad;
+  --self-teal-deep: #1f7763;
+  --self-cyan: #00e5c8;
+
+  --self-ice: #9dbdd0;
+  --self-ice-bright: #bcd9e9;
+  --self-ice-deep: #6f95ad;
+  --self-blue: #1db8d4;
+
+  --self-green: #3fb950;
+  --self-red: #f85149;
+  --self-yellow: #d29922;
+
+  --self-text: #eef4f7;
+  --self-text-2: #8a9caa;
+  --self-text-3: #556673;
+
+  --self-font-sans: "Exo 2", system-ui, -apple-system, sans-serif;
+  --self-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+  --self-font-wordmark: "Orbitron", var(--self-font-sans);
+
+  --self-radius: 10px;
+  --self-radius-sm: 6px;
+  --self-glow-teal: 0 0 60px -12px rgba(51, 167, 140, 0.45);
+
+  --self-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --self-dur-fast: 150ms;
+  --self-dur: 300ms;
+
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --self-bg-0: #eef1f6;
+  --self-bg-1: #ffffff;
+  --self-bg-2: #ffffff;
+  --self-bg-3: #f1f4f8;
+  --self-line: #d6dde6;
+  --self-line-strong: #c2cbd6;
+  --self-teal: #0a9d8c;
+  --self-teal-bright: #0a9d8c;
+  --self-cyan: #0a9d8c;
+  --self-text: #1a2230;
+  --self-text-2: #5b6776;
+  --self-text-3: #9aa5b1;
+  color-scheme: light;
+}

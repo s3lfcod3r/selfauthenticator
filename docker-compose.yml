@@ -1,0 +1,16 @@
+services:
+  selfauthenticator:
+    image: ghcr.io/kabelsalatundklartext/selfauthenticator:latest
+    container_name: selfauthenticator
+    ports:
+      - "${PORT:-8091}:8091"
+    environment:
+      # PFLICHT: 64-stelliges Hex-Secret. Erzeugen mit:
+      #   python -c "import secrets; print(secrets.token_hex(32))"
+      SELFAUTH_SECRET: ${SELFAUTH_SECRET}
+      # Nach Anlegen deines Accounts auf false setzen, um die Registrierung zu schliessen.
+      SELFAUTH_ALLOW_REGISTRATION: ${SELFAUTH_ALLOW_REGISTRATION:-true}
+      TZ: ${TZ:-Europe/Berlin}
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

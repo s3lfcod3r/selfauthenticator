@@ -1,0 +1,187 @@
+@import "./tokens.css";
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  font-family: var(--self-font-sans);
+  background: var(--self-bg-0);
+  color: var(--self-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  font-size: 0.92rem;
+  border: 1px solid var(--self-line-strong);
+  background: var(--self-bg-3);
+  color: var(--self-text);
+  border-radius: var(--self-radius-sm);
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  transition: border-color var(--self-dur-fast) var(--self-ease),
+    color var(--self-dur-fast) var(--self-ease),
+    background var(--self-dur-fast) var(--self-ease);
+}
+button:hover { border-color: var(--self-teal); color: var(--self-teal-bright); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.primary {
+  background: var(--self-teal-deep);
+  border-color: var(--self-teal);
+  color: var(--self-text);
+  font-weight: 600;
+}
+button.primary:hover { background: var(--self-teal); color: #fff; }
+button.ghost { background: transparent; border-color: var(--self-line); }
+button.danger:hover { border-color: var(--self-red); color: var(--self-red); }
+
+input, select {
+  font-family: inherit;
+  font-size: 0.95rem;
+  width: 100%;
+  background: var(--self-bg-3);
+  color: var(--self-text);
+  border: 1px solid var(--self-line);
+  border-radius: var(--self-radius-sm);
+  padding: 0.6rem 0.75rem;
+}
+input:focus, select:focus { outline: none; border-color: var(--self-teal); }
+label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0 0 0.3rem; }
+
+.wordmark {
+  font-family: var(--self-font-wordmark);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.wordmark .accent { color: var(--self-teal-bright); }
+
+/* ---------- Auth / Unlock ---------- */
+.auth-wrap {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: radial-gradient(120% 80% at 50% -10%, rgba(51, 167, 140, 0.16), transparent 60%),
+    var(--self-bg-0);
+}
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--self-bg-2);
+  border: 1px solid var(--self-line);
+  border-radius: var(--self-radius);
+  box-shadow: var(--self-glow-teal);
+  padding: 2rem 1.6rem;
+}
+.auth-card h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+.auth-sub { color: var(--self-text-2); font-size: 0.85rem; margin: 0 0 1.4rem; }
+.field { margin-bottom: 0.9rem; }
+.auth-error {
+  background: rgba(248, 81, 73, 0.12);
+  border: 1px solid rgba(248, 81, 73, 0.4);
+  color: #ffb4af;
+  border-radius: var(--self-radius-sm);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.9rem;
+}
+.auth-toggle { text-align: center; margin-top: 1rem; font-size: 0.82rem; color: var(--self-text-2); }
+.auth-toggle button { background: none; border: none; color: var(--self-teal-bright); padding: 0 0.2rem; }
+
+/* ---------- Vault shell ---------- */
+.shell { max-width: 640px; margin: 0 auto; padding: 1rem 1rem 5rem; }
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0 1rem;
+}
+.topbar .brand { font-size: 1.15rem; }
+.topbar .actions { display: flex; gap: 0.5rem; }
+.search { margin-bottom: 1rem; }
+
+.empty {
+  text-align: center;
+  color: var(--self-text-2);
+  padding: 3rem 1rem;
+  border: 1px dashed var(--self-line-strong);
+  border-radius: var(--self-radius);
+}
+
+/* ---------- Token card ---------- */
+.token-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  background: var(--self-bg-2);
+  border: 1px solid var(--self-line);
+  border-radius: var(--self-radius);
+  padding: 0.8rem 0.95rem;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  transition: border-color var(--self-dur-fast) var(--self-ease);
+}
+.token-card:hover { border-color: var(--self-line-strong); }
+.token-meta { flex: 1; min-width: 0; }
+.token-issuer { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.token-label { font-size: 0.78rem; color: var(--self-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.token-code {
+  font-family: var(--self-font-mono);
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  color: var(--self-teal-bright);
+}
+.token-code.copied { color: var(--self-cyan); }
+.token-right { display: flex; align-items: center; gap: 0.7rem; }
+.token-del { background: none; border: none; color: var(--self-text-3); padding: 0.2rem; }
+.token-del:hover { color: var(--self-red); }
+
+.ring { width: 34px; height: 34px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 3; }
+.ring .bg { stroke: var(--self-line-strong); }
+.ring .fg { stroke: var(--self-teal); transition: stroke-dashoffset 1s linear; }
+.ring.low .fg { stroke: var(--self-red); }
+
+/* ---------- FAB + modal ---------- */
+.fab {
+  position: fixed;
+  right: max(1rem, calc(50% - 320px + 1rem));
+  bottom: 1.4rem;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  background: var(--self-teal-deep);
+  border: 1px solid var(--self-teal);
+  box-shadow: var(--self-glow-teal);
+  display: grid; place-items: center;
+}
+.fab:hover { background: var(--self-teal); color: #fff; }
+
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(4, 7, 10, 0.7);
+  backdrop-filter: blur(4px);
+  display: grid; place-items: end center;
+  z-index: 20;
+}
+@media (min-width: 540px) { .modal-backdrop { place-items: center; } }
+.modal {
+  width: 100%;
+  max-width: 460px;
+  background: var(--self-bg-2);
+  border: 1px solid var(--self-line-strong);
+  border-radius: var(--self-radius) var(--self-radius) 0 0;
+  padding: 1.4rem;
+  max-height: 90vh;
+  overflow: auto;
+}
+@media (min-width: 540px) { .modal { border-radius: var(--self-radius); } }
+.modal h2 { margin: 0 0 1rem; font-size: 1.2rem; }
+.tabs { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
+.tabs button { flex: 1; }
+.tabs button.active { border-color: var(--self-teal); color: var(--self-teal-bright); }
+.modal-actions { display: flex; gap: 0.6rem; margin-top: 1.2rem; }
+.modal-actions button { flex: 1; }
+.scan-video { width: 100%; border-radius: var(--self-radius-sm); background: #000; aspect-ratio: 1; object-fit: cover; }
+.hint { font-size: 0.78rem; color: var(--self-text-3); margin-top: 0.5rem; }
