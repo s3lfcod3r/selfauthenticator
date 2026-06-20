@@ -66,7 +66,7 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
           Self<span className="accent">Authenticator</span>
         </h1>
         <p className="auth-sub">
-          {mode === "register" ? "Neuen Tresor anlegen" : "Tresor entsperren"} · Zero-Knowledge 2FA
+          {mode === "register" ? "Neuen Tresor anlegen" : "Tresor entsperren"} · Zero-Knowledge 2FA · v2
         </p>
 
         {(error || externalError) && <div className="auth-error">{error || externalError}</div>}
