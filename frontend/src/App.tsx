@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { Unlock } from "./pages/Unlock";
 import { VaultView } from "./pages/Vault";
 import { loadEntries, type DecryptedEntry, type Session } from "./lib/vault";
-import { setToken } from "./lib/api";
+import { getToken, setToken } from "./lib/api";
+import { keyFromB64, keyToB64 } from "./lib/crypto";
+import { nativeClearVaultKey, nativeGetVaultKey, nativeSaveVaultKey } from "./lib/native";
 
 type Phase = "locked" | "unlocking" | "unlocked";
 
@@ -20,6 +22,12 @@ export function App() {
       setSession(s);
       setEntries(loaded);
       setPhase("unlocked");
+      // Vault-Key fuer kuenftigen Biometrie-Unlock in der nativen App sichern.
+      try {
+        nativeSaveVaultKey(await keyToB64(s.vaultKey));
+      } catch {
+        /* kein nativer Host */
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Konnte Tresor nicht laden");
       setPhase("locked");
@@ -28,18 +36,37 @@ export function App() {
 
   const lock = useCallback(() => {
     setToken(null);
+    nativeClearVaultKey();
     setSession(null);
     setEntries([]);
     setPhase("locked");
   }, []);
 
-  // Sicherheit: bei Tab-Schliessen den VaultKey aus dem Speicher nehmen.
+  // Biometrie-Unlock (native App): Fingerabdruck gibt den gespeicherten Vault-Key
+  // frei -> direkter Einstieg ohne Master-Passwort, sofern das Token noch gilt.
   useEffect(() => {
-    const onHide = () => {
-      /* VaultKey bleibt im RAM waehrend der Sitzung; hier kein Persist noetig */
+    const token = getToken();
+    const keyB64 = nativeGetVaultKey();
+    if (!token || !keyB64) return;
+    let cancelled = false;
+    setPhase("unlocking");
+    (async () => {
+      try {
+        const vaultKey = await keyFromB64(keyB64);
+        const loaded = await loadEntries(vaultKey);
+        if (cancelled) return;
+        setSession({ email: "", vaultKey });
+        setEntries(loaded);
+        setPhase("unlocked");
+      } catch {
+        if (cancelled) return;
+        nativeClearVaultKey();
+        setPhase("locked");
+      }
+    })();
+    return () => {
+      cancelled = true;
     };
-    window.addEventListener("pagehide", onHide);
-    return () => window.removeEventListener("pagehide", onHide);
   }, []);
 
   if (phase === "unlocked" && session) {

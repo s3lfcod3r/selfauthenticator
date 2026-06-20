@@ -80,3 +80,14 @@ export async function decryptJson<T>(blobB64: string, key: Uint8Array): Promise<
   const s = await getSodium();
   return JSON.parse(s.to_string(await decryptBytes(blobB64, key))) as T;
 }
+
+// --- Schlüssel <-> Base64 (für nativen Biometrie-Unlock der Android-App) ---
+export async function keyToB64(key: Uint8Array): Promise<string> {
+  const s = await getSodium();
+  return s.to_base64(key, B64);
+}
+
+export async function keyFromB64(b64: string): Promise<Uint8Array> {
+  const s = await getSodium();
+  return s.from_base64(b64, B64);
+}
