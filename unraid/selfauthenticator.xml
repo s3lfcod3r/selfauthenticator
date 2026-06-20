@@ -9,7 +9,7 @@
   <Category>Tools: Security: Network:Other</Category>
   <WebUI>http://[IP]:[PORT:8091]/</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/kabelsalatundklartext/selfauthenticator/main/unraid/selfauthenticator.xml</TemplateURL>
-  <Icon>https://raw.githubusercontent.com/kabelsalatundklartext/selfauthenticator/main/frontend/public/favicon.svg</Icon>
+  <Icon>https://raw.githubusercontent.com/kabelsalatundklartext/selfauthenticator/main/frontend/public/icon.png</Icon>
   <Network>bridge</Network>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
