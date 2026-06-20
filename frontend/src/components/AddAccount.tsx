@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { normalizeSecret, parseOtpauthUri, validSecret, type TotpData } from "../lib/totp";
+import { hasNativeScanner, nativeScan } from "../lib/native";
 
 type Tab = "scan" | "uri" | "manual";
 
@@ -95,7 +96,18 @@ export function AddAccount({ onAdd, onClose }: Props) {
           </>
         )}
 
-        {tab === "scan" && <QrScan onText={(t) => { setUri(t); try { onAdd(parseOtpauthUri(t)); } catch (e) { setError(e instanceof Error ? e.message : "QR ungueltig"); setTab("uri"); } }} onError={(m) => { setError(m); setTab("uri"); }} onClose={onClose} />}
+        {tab === "scan" &&
+          (hasNativeScanner() ? (
+            <>
+              <p className="hint">Tippe auf „Kamera öffnen" und halte den QR-Code des Kontos in den Rahmen.</p>
+              <div className="modal-actions">
+                <button className="ghost" onClick={onClose}>Abbrechen</button>
+                <button className="primary" onClick={() => nativeScan()}>Kamera öffnen</button>
+              </div>
+            </>
+          ) : (
+            <QrScan onText={(t) => { setUri(t); try { onAdd(parseOtpauthUri(t)); } catch (e) { setError(e instanceof Error ? e.message : "QR ungueltig"); setTab("uri"); } }} onError={(m) => { setError(m); setTab("uri"); }} onClose={onClose} />
+          ))}
       </div>
     </div>
   );

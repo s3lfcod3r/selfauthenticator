@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { TokenCard } from "../components/TokenCard";
 import { AddAccount } from "../components/AddAccount";
 import { addEntry, deleteEntry, type DecryptedEntry, type Session } from "../lib/vault";
-import type { TotpData } from "../lib/totp";
+import { parseOtpauthUri, type TotpData } from "../lib/totp";
 
 interface Props {
   session: Session;
@@ -22,6 +22,21 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
     const id = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(id);
   }, []);
+
+  // Native Android-App ruft nach einem QR-Scan window.__selfauthOnScan(uri).
+  useEffect(() => {
+    const w = window as unknown as { __selfauthOnScan?: (uri: string) => void };
+    w.__selfauthOnScan = (uri: string) => {
+      try {
+        void handleAdd(parseOtpauthUri(uri));
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "QR ungueltig");
+      }
+    };
+    return () => {
+      delete w.__selfauthOnScan;
+    };
+  }, [session]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

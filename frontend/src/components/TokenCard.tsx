@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { currentCode, formatCode, type TotpData } from "../lib/totp";
+import { nativeCopy } from "../lib/native";
 import type { DecryptedEntry } from "../lib/vault";
 
 interface Props {
@@ -29,7 +30,8 @@ export function TokenCard({ entry, tick, onDelete }: Props) {
       await navigator.clipboard.writeText(code);
       setCopied(true);
     } catch {
-      /* Clipboard evtl. nicht verfuegbar (kein HTTPS) */
+      // Über HTTP kein Web-Clipboard -> native Brücke der Android-App nutzen.
+      if (nativeCopy(code)) setCopied(true);
     }
   }
 
