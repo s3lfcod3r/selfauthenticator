@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 
@@ -20,8 +20,9 @@ router = APIRouter(prefix="/api/vault", tags=["vault"])
 
 
 class EntryIn(BaseModel):
-    id: str = Field(min_length=8, max_length=64)
-    ciphertext: str = Field(min_length=1)
+    id: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+    # Obergrenze gegen DB-Flutung; ein TOTP-Eintrag ist nur wenige hundert Byte.
+    ciphertext: str = Field(min_length=24, max_length=20000)
     # Bekannte Revision des Clients; None = Neuanlage.
     base_revision: int | None = None
 
@@ -87,7 +88,7 @@ def upsert_entry(
 
 @router.delete("/{entry_id}", response_model=EntryOut)
 def delete_entry(
-    entry_id: str,
+    entry_id: str = Path(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9_-]+$"),
     user: User = Depends(security.get_current_user),
     session: Session = Depends(get_session),
 ) -> EntryOut:

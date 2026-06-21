@@ -24,6 +24,10 @@ from .db import get_session
 _ph = PasswordHasher()
 _bearer = HTTPBearer(auto_error=True)
 
+# JWT-Decode akzeptiert NUR diese (symmetrischen) Algorithmen — hart verdrahtet,
+# damit weder "none" noch ein asymmetrischer Confusion-Trick je greifen kann.
+_ALLOWED_DECODE_ALGS = ["HS256", "HS384", "HS512"]
+
 
 def hash_auth(client_auth_hash: str) -> str:
     """Langsamer Server-Hash des (hochentropischen) Client-AuthHash."""
@@ -66,7 +70,7 @@ def get_current_user_id(
 ) -> int:
     s = get_settings()
     try:
-        payload = jwt.decode(creds.credentials, s.secret, algorithms=[s.jwt_algorithm])
+        payload = jwt.decode(creds.credentials, s.secret, algorithms=_ALLOWED_DECODE_ALGS)
         return int(payload["sub"])
     except Exception as exc:
         raise HTTPException(
