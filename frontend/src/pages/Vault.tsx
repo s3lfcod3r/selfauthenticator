@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { TokenCard } from "../components/TokenCard";
 import { AddAccount } from "../components/AddAccount";
+import { BackupModal } from "../components/BackupModal";
 import { addEntry, deleteEntry, type DecryptedEntry, type Session } from "../lib/vault";
 import { parseOtpauthUri, type TotpData } from "../lib/totp";
 
@@ -15,6 +16,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
   const [tick, setTick] = useState(0);
   const [query, setQuery] = useState("");
   const [adding, setAdding] = useState(false);
+  const [backup, setBackup] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Ein zentraler 1s-Tick fuer alle Karten (statt Timer pro Karte).
@@ -74,13 +76,34 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
     }
   }
 
+  async function handleImport(list: TotpData[]) {
+    setError(null);
+    try {
+      const added: DecryptedEntry[] = [];
+      for (const data of list) {
+        added.push(await addEntry(session.vaultKey, data));
+      }
+      setEntries((prev) =>
+        [...prev, ...added].sort((a, b) =>
+          (a.data.issuer || a.data.label).localeCompare(b.data.issuer || b.data.label, "de"),
+        ),
+      );
+      setBackup(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Import fehlgeschlagen");
+    }
+  }
+
   return (
     <div className="shell">
       <header className="topbar">
         <span className="brand wordmark">
-          Self<span className="accent">Auth</span>
+          <span className="ice">Self</span><span className="accent">Auth</span>
         </span>
         <div className="actions">
+          <button className="ghost" onClick={() => setBackup(true)} title="Backup / Wiederherstellen">
+            Backup
+          </button>
           <button className="ghost" onClick={onLock} title="Tresor sperren">
             Sperren
           </button>
@@ -116,6 +139,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       </button>
 
       {adding && <AddAccount onAdd={handleAdd} onClose={() => setAdding(false)} />}
+      {backup && <BackupModal entries={entries} onImport={handleImport} onClose={() => setBackup(false)} />}
     </div>
   );
 }

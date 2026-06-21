@@ -7,7 +7,7 @@
 **Self-hosted, zero-knowledge 2FA / TOTP vault — your own alternative to Synology Secure SignIn, Authy & Co.**
 
 [![Build](https://github.com/kabelsalatundklartext/selfauthenticator/actions/workflows/docker.yml/badge.svg)](https://github.com/kabelsalatundklartext/selfauthenticator/actions/workflows/docker.yml)
-![Version](https://img.shields.io/badge/version-2.0.9-33A78C)
+![Version](https://img.shields.io/badge/version-2.1.0-33A78C)
 ![License](https://img.shields.io/badge/license-private-8A9CAA)
 ![Backend](https://img.shields.io/badge/backend-FastAPI-009688)
 ![Web](https://img.shields.io/badge/web-React%20PWA-43D3AD)
@@ -35,6 +35,7 @@ Part of the **Self** family (SelfMailer, SelfArchiver, SelfDashboard …) — sa
 - 👆 **Biometric unlock** — fingerprint replaces the master password on the app
 - 📷 **Native QR scanner** — add accounts by scanning (works even over HTTP)
 - 🔄 **Multi-device sync** — encrypted, with per-entry revisions
+- 💾 **Encrypted backup / restore** — password-protected file, portable between web & app
 - 🐳 **Single container** — FastAPI + SQLite, no external database
 - 🎨 **On-brand** — Self design system, dark by default
 
@@ -138,9 +139,9 @@ cd frontend && npm install && npm run dev   # http://localhost:5173, proxies /ap
 
 ### 🗺️ Roadmap
 
-- [ ] HTTPS guide (reverse proxy) → unlocks web camera + TWA
+- [x] **[HTTPS guide](docs/HTTPS.md)** (reverse proxy) → unlocks web camera + TWA
+- [x] **Encrypted export / backup** (password-protected, web ↔ app)
 - [ ] Bulk import (Google Authenticator `otpauth-migration://`)
-- [ ] Encrypted export / backup
 - [ ] Optional passwords (vault schema is already generic)
 - [ ] Tests toward 80 % coverage
 
@@ -162,6 +163,7 @@ Teil der **Self**-Reihe (SelfMailer, SelfArchiver, SelfDashboard …) — gleich
 - 👆 **Biometrie-Entsperrung** — Fingerabdruck ersetzt das Master-Passwort in der App
 - 📷 **Nativer QR-Scanner** — Konten per Scan hinzufügen (auch über HTTP)
 - 🔄 **Mehrgeräte-Sync** — verschlüsselt, mit Revision pro Eintrag
+- 💾 **Verschlüsseltes Backup / Wiederherstellen** — passwortgeschützte Datei, zwischen Web & App austauschbar
 - 🐳 **Ein Container** — FastAPI + SQLite, keine externe Datenbank
 - 🎨 **Markentreu** — Self-Design-System, dunkel als Standard
 
@@ -265,9 +267,9 @@ cd frontend && npm install && npm run dev   # http://localhost:5173, proxyt /api
 
 ### 🗺️ Roadmap
 
-- [ ] HTTPS-Anleitung (Reverse-Proxy) → schaltet Web-Kamera + TWA frei
+- [x] **[HTTPS-Anleitung](docs/HTTPS.md)** (Reverse-Proxy) → schaltet Web-Kamera + TWA frei
+- [x] **Verschlüsselter Export / Backup** (passwortgeschützt, Web ↔ App)
 - [ ] Massen-Import (Google-Authenticator `otpauth-migration://`)
-- [ ] Verschlüsselter Export / Backup
 - [ ] Optionale Passwörter (Vault-Schema ist bereits generisch)
 - [ ] Tests Richtung 80 % Coverage
 
