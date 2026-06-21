@@ -214,3 +214,6 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
   font-size: 1.05rem;
   flex-shrink: 0;
 }
+.auth-card .wordmark,
+.auth-card .auth-sub,
+.auth-card .app-version { text-align: center; }
