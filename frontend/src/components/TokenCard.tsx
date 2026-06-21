@@ -40,6 +40,7 @@ export function TokenCard({ entry, tick, onDelete }: Props) {
 
   return (
     <div className="token-card" onClick={copy} title="Antippen zum Kopieren">
+      <div className="token-avatar">{(data.issuer || data.label || "K").charAt(0).toUpperCase()}</div>
       <div className="token-meta">
         <div className="token-issuer">{data.issuer || data.label || "Konto"}</div>
         {data.label && data.issuer && <div className="token-label">{data.label}</div>}

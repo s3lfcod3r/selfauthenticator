@@ -185,3 +185,32 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
 .modal-actions button { flex: 1; }
 .scan-video { width: 100%; border-radius: var(--self-radius-sm); background: #000; aspect-ratio: 1; object-fit: cover; }
 .hint { font-size: 0.78rem; color: var(--self-text-3); margin-top: 0.5rem; }
+
+/* --- Marken-Abgleich: Logo, Wordmark zweifarbig (Self eisblau), Avatar, Version --- */
+.auth-logo {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 0.5rem;
+}
+.wordmark .ice { color: var(--self-ice); }
+.wordmark .accent { color: var(--self-teal); }
+.app-version {
+  text-align: center;
+  color: var(--self-text-3);
+  font-size: 0.72rem;
+  margin-top: 0.9rem;
+}
+.token-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(51, 167, 140, 0.18);
+  color: var(--self-teal-bright);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}

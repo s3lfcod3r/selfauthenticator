@@ -62,11 +62,12 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
   return (
     <div className="auth-wrap">
       <form className="auth-card" onSubmit={submit}>
+        <img className="auth-logo" src="/shield.png" alt="" />
         <h1 className="wordmark">
-          Self<span className="accent">Authenticator</span>
+          <span className="ice">Self</span><span className="accent">Authenticator</span>
         </h1>
         <p className="auth-sub">
-          {mode === "register" ? "Neuen Tresor anlegen" : "Tresor entsperren"} · Zero-Knowledge 2FA · v2
+          {mode === "register" ? "Neuen Tresor anlegen" : "Tresor entsperren"} · Zero-Knowledge 2FA
         </p>
 
         {(error || externalError) && <div className="auth-error">{error || externalError}</div>}
@@ -137,6 +138,7 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
             )}
           </div>
         )}
+        <p className="app-version">v2.0.9</p>
       </form>
     </div>
   );
