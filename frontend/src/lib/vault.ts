@@ -27,34 +27,44 @@ function randomId(): string {
 export async function unlock(email: string, password: string): Promise<Session> {
   const pre = await api.prelogin(email);
   const masterKey = await deriveMasterKey(password, pre.kdf_salt, pre.kdf_mem_kib, pre.kdf_ops);
-  const authHash = await deriveAuthHash(masterKey, password);
-  const res = await api.login(email, authHash);
-  setToken(res.token);
-  const vaultKey = await unwrapKey(res.protected_vault_key, masterKey);
-  return { email, vaultKey };
+  try {
+    const authHash = await deriveAuthHash(masterKey, password);
+    const res = await api.login(email, authHash);
+    setToken(res.token);
+    const vaultKey = await unwrapKey(res.protected_vault_key, masterKey);
+    return { email, vaultKey };
+  } finally {
+    // MasterKey aus dem Speicher raeumen, sobald VaultKey ausgepackt ist.
+    masterKey.fill(0);
+  }
 }
 
 export async function register(email: string, password: string): Promise<Session> {
   const salt = await generateSalt();
   const masterKey = await deriveMasterKey(password, salt, DEFAULT_MEM_KIB, DEFAULT_OPS);
-  const authHash = await deriveAuthHash(masterKey, password);
-  const vaultKey = await generateVaultKey();
-  const protectedVaultKey = await wrapKey(vaultKey, masterKey);
-  const res = await api.register({
-    email,
-    kdf_salt: salt,
-    kdf_mem_kib: DEFAULT_MEM_KIB,
-    kdf_ops: DEFAULT_OPS,
-    auth_hash: authHash,
-    protected_vault_key: protectedVaultKey,
-  });
-  setToken(res.token);
-  return { email, vaultKey };
+  try {
+    const authHash = await deriveAuthHash(masterKey, password);
+    const vaultKey = await generateVaultKey();
+    const protectedVaultKey = await wrapKey(vaultKey, masterKey);
+    const res = await api.register({
+      email,
+      kdf_salt: salt,
+      kdf_mem_kib: DEFAULT_MEM_KIB,
+      kdf_ops: DEFAULT_OPS,
+      auth_hash: authHash,
+      protected_vault_key: protectedVaultKey,
+    });
+    setToken(res.token);
+    return { email, vaultKey };
+  } finally {
+    masterKey.fill(0);
+  }
 }
 
 export async function loadEntries(vaultKey: Uint8Array): Promise<DecryptedEntry[]> {
   const { entries } = await api.listVault();
   const out: DecryptedEntry[] = [];
+  let failed = 0;
   for (const e of entries) {
     if (e.deleted) continue;
     try {
@@ -62,7 +72,11 @@ export async function loadEntries(vaultKey: Uint8Array): Promise<DecryptedEntry[
       out.push({ id: e.id, revision: e.revision, data });
     } catch {
       // Eintrag mit falschem/anderem Key -> ueberspringen statt App zu crashen.
+      failed += 1;
     }
+  }
+  if (failed > 0) {
+    console.warn(`[SelfAuth] ${failed} Eintrag/Eintraege konnten nicht entschluesselt werden.`);
   }
   out.sort((a, b) =>
     (a.data.issuer || a.data.label).localeCompare(b.data.issuer || b.data.label, "de"),

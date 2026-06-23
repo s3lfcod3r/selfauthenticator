@@ -2,7 +2,8 @@
 FROM node:22-bookworm-slim AS frontend
 WORKDIR /fe
 COPY frontend/package*.json ./
-RUN npm install
+# npm ci -> exakt nach package-lock.json (reproduzierbar), schlaegt bei Drift fehl.
+RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
@@ -16,6 +17,13 @@ COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./
 COPY --from=frontend /fe/dist ./frontend/dist
+# Als non-root laufen. UID/GID 99:100 = Unraid 'nobody:users', damit der
+# gebindmountete /data-Ordner (typischerweise 99:100) beschreibbar bleibt.
+# WICHTIG bei bestehender Installation: einmalig auf dem Host `chown -R 99:100`
+# fuer den Data-Ordner ausfuehren, sonst kann die DB nicht geschrieben werden.
+RUN useradd --uid 99 --gid 100 --no-create-home --shell /usr/sbin/nologin appuser \
+    && mkdir -p /data && chown -R 99:100 /app /data
+USER 99:100
 VOLUME ["/data"]
 EXPOSE 8091
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

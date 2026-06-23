@@ -22,6 +22,8 @@ davor. Drei gängige Wege:
 
 1. In Unraid die App **„Nginx-Proxy-Manager"** (NPM) aus den Apps installieren.
 2. NPM öffnen (`http://<unraid-ip>:81`, Standard-Login `admin@example.com` / `changeme`).
+   > **Wichtig:** Ändere diese Standard-Zugangsdaten **sofort** nach dem ersten Login —
+   > ein offenes NPM-Admin-Panel mit bekanntem Passwort ist ein ernstes Risiko.
 3. **Proxy Hosts → Add Proxy Host:**
    - **Domain Names:** `auth.deinedomain.de` (eine Subdomain, die auf deine IP zeigt)
    - **Scheme:** `http`

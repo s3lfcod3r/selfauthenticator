@@ -11,7 +11,10 @@ Rate-Limiting bremst Brute-Force gegen /login & /register.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr, Field
 from sqlmodel import Session, func, select
 
@@ -19,7 +22,7 @@ from ..core import security
 from ..core.config import get_settings
 from ..core.db import get_session
 from ..core.ratelimit import limiter
-from ..models import User
+from ..models import RevokedToken, User
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -44,7 +47,8 @@ class PreloginOut(BaseModel):
 
 class RegisterIn(BaseModel):
     email: EmailStr
-    kdf_salt: str = Field(min_length=8, max_length=128)
+    # >= 128-bit Salt (16 Byte -> 24 base64-Zeichen). Verhindert zu kurze Salts.
+    kdf_salt: str = Field(min_length=22, max_length=128)
     kdf_mem_kib: int = Field(default=_DEFAULT_KDF_MEM_KIB, ge=_MIN_KDF_MEM_KIB, le=1048576)
     kdf_ops: int = Field(default=_DEFAULT_KDF_OPS, ge=_MIN_KDF_OPS, le=20)
     auth_hash: str = Field(min_length=16, max_length=256)
@@ -132,8 +136,11 @@ def register(request: Request, body: RegisterIn, session: Session = Depends(get_
 @limiter.limit("10/minute")
 def login(request: Request, body: LoginIn, session: Session = Depends(get_session)) -> TokenOut:
     user = _find_user(session, body.email)
-    # Konstante Fehlermeldung egal ob E-Mail oder AuthHash falsch ist.
-    if user is None or not security.verify_auth(user.auth_hash, body.auth_hash):
+    # Konstante Fehlermeldung egal ob E-Mail oder AuthHash falsch ist. verify_auth
+    # laeuft auch bei unbekanntem Account (stored=None) die volle Argon2-Pruefung
+    # -> keine Timing-Unterscheidung "Konto existiert (nicht)".
+    stored = user.auth_hash if user is not None else None
+    if not security.verify_auth(stored, body.auth_hash):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "E-Mail oder Master-Passwort falsch")
 
     return TokenOut(
@@ -148,3 +155,33 @@ def login(request: Request, body: LoginIn, session: Session = Depends(get_sessio
 @router.get("/me")
 def me(user: User = Depends(security.get_current_user)) -> dict:
     return {"email": user.email}
+
+
+@router.post("/logout")
+@limiter.limit("30/minute")
+def logout(
+    request: Request,
+    creds: HTTPAuthorizationCredentials = Depends(security.bearer_scheme),
+    session: Session = Depends(get_session),
+) -> dict:
+    """Widerruft das vorgelegte JWT (Blocklist via jti). Abgelaufene Eintraege
+    werden bei dieser Gelegenheit aufgeraeumt, damit die Tabelle klein bleibt."""
+    now = datetime.now(timezone.utc)
+    try:
+        payload = security.decode_token(creds.credentials)
+    except Exception:
+        # Bereits ungueltig/abgelaufen -> nichts zu tun.
+        return {"ok": True}
+
+    jti = payload.get("jti")
+    if jti:
+        already = session.exec(select(RevokedToken).where(RevokedToken.jti == jti)).first()
+        if already is None:
+            exp = datetime.fromtimestamp(int(payload.get("exp", now.timestamp())), tz=timezone.utc)
+            session.add(RevokedToken(jti=jti, expires_at=exp))
+
+    # Aufraeumen abgelaufener Blocklist-Eintraege, damit die Tabelle klein bleibt.
+    for stale in session.exec(select(RevokedToken).where(RevokedToken.expires_at < now)).all():
+        session.delete(stale)
+    session.commit()
+    return {"ok": True}

@@ -43,6 +43,10 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    // Keine Sourcemaps in Produktion -> Krypto-Quelltext nicht offenlegen.
+    sourcemap: false,
+  },
   resolve: {
     alias: {
       "libsodium-wrappers-sumo": sodiumCjs,

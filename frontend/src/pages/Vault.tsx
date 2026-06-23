@@ -26,14 +26,26 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
   }, []);
 
   // Native Android-App ruft nach einem QR-Scan window.__selfauthOnScan(uri).
+  // Nur registrieren, wenn wirklich ein nativer Host (SelfAuthNative) vorhanden
+  // ist — im reinen Browser bleibt der globale Callback sonst eine Injection-
+  // Flaeche, ueber die fremdes Script ungefragt Konten anlegen koennte.
   useEffect(() => {
-    const w = window as unknown as { __selfauthOnScan?: (uri: string) => void };
+    const w = window as unknown as {
+      __selfauthOnScan?: (uri: string) => void;
+      SelfAuthNative?: unknown;
+    };
+    if (!w.SelfAuthNative) return;
     w.__selfauthOnScan = (uri: string) => {
+      let data: TotpData;
       try {
-        void handleAdd(parseOtpauthUri(uri));
+        data = parseOtpauthUri(uri);
       } catch (e) {
         setError(e instanceof Error ? e.message : "QR ungueltig");
+        return;
       }
+      handleAdd(data).catch((e) =>
+        setError(e instanceof Error ? e.message : "Hinzufuegen fehlgeschlagen"),
+      );
     };
     return () => {
       delete w.__selfauthOnScan;

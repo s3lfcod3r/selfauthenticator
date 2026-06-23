@@ -8,6 +8,17 @@ import type { DecryptedEntry } from "./vault";
 const FORMAT = "selfauth-backup";
 const MEM_KIB = 65536;
 const OPS = 3;
+// Grenzen fuer KDF-Parameter aus einer (nicht vertrauenswuerdigen) Backup-Datei,
+// damit ein manipuliertes mem_kib nicht den Tab per OOM lahmlegt.
+const MIN_MEM_KIB = 8192;
+const MAX_MEM_KIB = 1048576; // 1 GiB
+const MIN_OPS = 1;
+const MAX_OPS = 10;
+
+function clamp(value: number, min: number, max: number, fallback: number): number {
+  if (!Number.isFinite(value) || value <= 0) return fallback;
+  return Math.min(Math.max(Math.floor(value), min), max);
+}
 
 interface BackupFile {
   format: string;
@@ -46,7 +57,9 @@ export async function parseBackup(text: string, password: string): Promise<TotpD
   if (file.format !== FORMAT || !file.salt || !file.data) {
     throw new Error("Keine SelfAuthenticator-Backup-Datei.");
   }
-  const key = await deriveMasterKey(password, file.salt, file.mem_kib || MEM_KIB, file.ops || OPS);
+  const memKib = clamp(file.mem_kib, MIN_MEM_KIB, MAX_MEM_KIB, MEM_KIB);
+  const ops = clamp(file.ops, MIN_OPS, MAX_OPS, OPS);
+  const key = await deriveMasterKey(password, file.salt, memKib, ops);
   try {
     const list = await decryptJson<TotpData[]>(file.data, key);
     if (!Array.isArray(list)) throw new Error("bad");

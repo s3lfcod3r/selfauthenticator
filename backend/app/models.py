@@ -50,3 +50,12 @@ class VaultEntry(SQLModel, table=True):
     # Geraete die Loeschung mitbekommen.
     deleted: bool = False
     updated_at: datetime = Field(default_factory=_utcnow)
+
+
+class RevokedToken(SQLModel, table=True):
+    """Blocklist widerrufener JWTs (Logout). Eintraege koennen nach Ablauf
+    (expires_at) gefahrlos entfernt werden."""
+
+    jti: str = Field(primary_key=True)
+    expires_at: datetime
+    revoked_at: datetime = Field(default_factory=_utcnow)

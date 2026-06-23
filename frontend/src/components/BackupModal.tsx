@@ -99,6 +99,7 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
               <label>Backup-Passwort</label>
               <input
                 type="password"
+                autoComplete="new-password"
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 placeholder="mind. 8 Zeichen"
@@ -128,7 +129,7 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
             </div>
             <div className="field">
               <label>Backup-Passwort</label>
-              <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
+              <input type="password" autoComplete="off" value={pw} onChange={(e) => setPw(e.target.value)} />
             </div>
             <div className="modal-actions">
               <button className="ghost" onClick={onClose}>Schliessen</button>

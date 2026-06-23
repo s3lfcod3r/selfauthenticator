@@ -42,7 +42,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         response.headers["Content-Security-Policy"] = _CSP
+        # Hinweis: HSTS bewusst NICHT hier — die App wird im LAN auch ueber http
+        # genutzt; HSTS muss der TLS-terminierende Reverse-Proxy setzen (docs/HTTPS.md).
         return response
 
 

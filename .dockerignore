@@ -1,0 +1,15 @@
+# Build-Context schlank halten und Geheimnisse/Ballast nicht ins Image ziehen.
+.git
+.github
+android
+docs
+unraid
+*.md
+.env
+.env.*
+!.env.example
+data
+frontend/node_modules
+frontend/dist
+**/__pycache__
+**/*.pyc
