@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="frontend/public/shield.png" width="120" alt="SelfAuthenticator logo" />
+<img src="assets/logo.png" width="240" alt="SelfAuthenticator logo" />
 
 # SelfAuthenticator
 
