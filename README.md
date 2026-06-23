@@ -6,7 +6,7 @@
 
 **Self-hosted, zero-knowledge 2FA / TOTP vault — your own alternative to Synology Secure SignIn, Authy & Co.**
 
-[![Build](https://github.com/kabelsalatundklartext/selfauthenticator/actions/workflows/docker.yml/badge.svg)](https://github.com/kabelsalatundklartext/selfauthenticator/actions/workflows/docker.yml)
+[![Build](https://github.com/s3lfcod3r/selfauthenticator/actions/workflows/docker.yml/badge.svg)](https://github.com/s3lfcod3r/selfauthenticator/actions/workflows/docker.yml)
 ![Version](https://img.shields.io/badge/version-2.2.0-33A78C)
 ![License](https://img.shields.io/badge/license-private-8A9CAA)
 ![Backend](https://img.shields.io/badge/backend-FastAPI-009688)
@@ -85,7 +85,7 @@ Open `http://<host>:8091` → create the first account → then set `SELFAUTH_AL
 ### 📦 Unraid
 
 Add the template from
-`https://raw.githubusercontent.com/kabelsalatundklartext/selfauthenticator/main/unraid/selfauthenticator.xml`
+`https://raw.githubusercontent.com/s3lfcod3r/selfauthenticator/main/unraid/selfauthenticator.xml`
 or import it in *Docker → Add Container → Template*. Set the **Master Secret**, leave the rest on defaults.
 
 ### ⚙️ Configuration (ENV, prefix `SELFAUTH_`)
@@ -224,7 +224,7 @@ docker compose up -d
 ### 📦 Unraid
 
 Template hinzufügen über
-`https://raw.githubusercontent.com/kabelsalatundklartext/selfauthenticator/main/unraid/selfauthenticator.xml`
+`https://raw.githubusercontent.com/s3lfcod3r/selfauthenticator/main/unraid/selfauthenticator.xml`
 oder unter *Docker → Add Container → Template* importieren. **Master Secret** eintragen, Rest auf Standard lassen.
 
 ### ⚙️ Konfiguration (ENV, Prefix `SELFAUTH_`)

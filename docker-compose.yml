@@ -1,6 +1,6 @@
 services:
   selfauthenticator:
-    image: ghcr.io/kabelsalatundklartext/selfauthenticator:latest
+    image: ghcr.io/s3lfcod3r/selfauthenticator:latest
     container_name: selfauthenticator
     ports:
       - "${PORT:-8091}:8091"
