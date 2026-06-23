@@ -2,7 +2,6 @@
 
 <img src="assets/logo.png" width="240" alt="SelfAuthenticator logo" />
 
-# SelfAuthenticator
 
 **Self-hosted, zero-knowledge 2FA / TOTP vault — your own alternative to Synology Secure SignIn, Authy & Co.**
 
