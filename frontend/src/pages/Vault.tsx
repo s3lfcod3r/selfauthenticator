@@ -109,8 +109,11 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
   return (
     <div className="shell">
       <header className="topbar">
-        <span className="brand wordmark">
-          <span className="ice">Self</span><span className="accent">Auth</span>
+        <span className="brand">
+          <img className="brand-logo" src="/shield.png" alt="" />
+          <span className="wordmark">
+            <span className="ice">Self</span><span className="accent">Auth</span>
+          </span>
         </span>
         <div className="actions">
           <button className="ghost" onClick={() => setBackup(true)} title="Backup / Wiederherstellen">
