@@ -10,7 +10,7 @@
 ![License](https://img.shields.io/badge/license-private-8A9CAA)
 ![Backend](https://img.shields.io/badge/backend-FastAPI-009688)
 ![Web](https://img.shields.io/badge/web-React%20PWA-43D3AD)
-![App](https://img.shields.io/badge/android-Kotlin%20%2B%20Compose-9DBDD0)
+![App](https://img.shields.io/badge/android-planned-9DBDD0)
 
 [English](#english) · [Deutsch](#deutsch)
 
@@ -22,7 +22,7 @@
 
 ## 🇬🇧 English
 
-A single Docker container that runs a **2FA / TOTP vault** — the web UI **and** the API that the native Android app talks to. Your TOTP secrets are stored **end-to-end encrypted**; the server only ever sees ciphertext.
+A single Docker container that runs a **2FA / TOTP vault** — the web UI **and** the API behind it. Your TOTP secrets are stored **end-to-end encrypted**; the server only ever sees ciphertext.
 
 Part of the **Self** family (SelfMailer, SelfArchiver, SelfDashboard …) — same design system, same deploy style (GHCR → Unraid).
 
@@ -30,17 +30,15 @@ Part of the **Self** family (SelfMailer, SelfArchiver, SelfDashboard …) — sa
 
 - 🔐 **Zero-knowledge** — secrets are encrypted on your device; the server can never read them
 - 🌐 **Web UI (PWA)** — installable, works in any browser
-- 📱 **Native Android app** — Kotlin + Jetpack Compose, talks directly to the API
-- 👆 **Biometric unlock** — fingerprint replaces the master password on the app
-- 📷 **Native QR scanner** — add accounts by scanning (works even over HTTP)
 - 🔄 **Multi-device sync** — encrypted, with per-entry revisions
-- 💾 **Encrypted backup / restore** — password-protected file, portable between web & app
+- 💾 **Encrypted backup / restore** — password-protected file, portable across devices
 - 🐳 **Single container** — FastAPI + SQLite, no external database
 - 🎨 **On-brand** — Self design system, dark by default
+- 📱 **Native Android app** — _planned_ (Kotlin + Compose, biometric unlock, native QR scanner)
 
 ### 🛡️ Security model (zero-knowledge)
 
-The server **never** stores plaintext. All TOTP seeds are encrypted/decrypted **only** on the client (browser / app).
+The server **never** stores plaintext. All TOTP seeds are encrypted/decrypted **only** on the client (browser).
 
 ```
 Master password ──Argon2id──► MasterKey   (never leaves your device)
@@ -57,17 +55,17 @@ Master password ──Argon2id──► MasterKey   (never leaves your device)
 - The server only knows: e-mail, public KDF salt, an Argon2 hash of the AuthHash, and opaque ciphertext blobs → **DB theft yields garbage**
 - ⚠️ The master password **cannot** be reset. Forget it = your codes are irreversibly encrypted.
 
-**Hardening (v2.0.9):** rate limiting on login/register, hard-pinned JWT algorithms, server-side KDF minimums, security headers + CSP, ciphertext/ID size limits. Android: `allowBackup=false`, JWT token kept in the Android Keystore. Reviewed with the ECC security reviewer.
+**Hardening (v2.0.9):** rate limiting on login/register, hard-pinned JWT algorithms, server-side KDF minimums, security headers + CSP, ciphertext/ID size limits. Reviewed with the ECC security reviewer.
 
-**Hardening (v2.2.0):** full line-by-line review of container + app. Added: session logout with **server-side JWT revocation** (blocklist), **constant-time login** (no account-enumeration via timing), rate-limited vault endpoints + per-user entry cap, **biometric unlock bound to an Android Keystore key via `BiometricPrompt.CryptoObject`** (the vault key is released only after OS-verified biometrics, not a UI-only gate), key separation, **non-root container**, `Permissions-Policy`, in-memory key zeroing.
+**Hardening (v2.2.0):** full line-by-line review of the container. Added: session logout with **server-side JWT revocation** (blocklist), **constant-time login** (no account-enumeration via timing), rate-limited vault endpoints + per-user entry cap, key separation, **non-root container**, `Permissions-Policy`, in-memory key zeroing.
 
 ### 🔒 Remote access
 
 The container speaks plain **HTTP** and is meant to live on a trusted network. Pick what fits:
 
 - **LAN only** — reach it at `http://<host>:8091` from inside your network.
-- **VPN (recommended for personal use)** — expose nothing publicly; reach the LAN address through WireGuard / Tailscale. The tunnel already encrypts everything end-to-end, so plain HTTP is fine and the **native app works as-is**.
-- **HTTPS reverse proxy** — for public exposure without a VPN; see the **[HTTPS guide](docs/HTTPS.md)**. Also required if you want the **web** camera/clipboard (browser secure-context); the native app never needs it.
+- **VPN (recommended for personal use)** — expose nothing publicly; reach the LAN address through WireGuard / Tailscale. The tunnel already encrypts everything end-to-end, so plain HTTP is fine.
+- **HTTPS reverse proxy** — for public exposure without a VPN; see the **[HTTPS guide](docs/HTTPS.md)**. Also required if you want the **web** camera/clipboard (browser secure-context).
 
 ### 🚀 Quick start (Docker)
 
@@ -96,16 +94,16 @@ or import it in *Docker → Add Container → Template*. Set the **Master Secret
 | `SELFAUTH_DB_PATH` | – | `/data/selfauthenticator.db` | SQLite path |
 | `PORT` | – | `8091` | Host port |
 
-### 📱 Android app
+### 📱 Android app (planned)
 
-A real native authenticator (`android/SelfAuthenticator.apk`):
+A native Android authenticator is on the roadmap — **not yet shipped** (no APK in this repo). The planned design:
 
-- Talks **directly** to the API — no embedded web view, no caching headaches
+- Talks **directly** to the same API — no embedded web view
 - **Same libsodium crypto** as the web → the same account/vault works everywhere
 - **Fingerprint unlock**, **native CameraX + ML Kit QR scanner**, native clipboard
 - Server URL entered on first launch
 
-Install the APK, open it, enter `http://<host>:8091`, log in once with your master password — after that, fingerprint unlocks the vault directly.
+For now, use the **Web UI (PWA)** — it is installable and works in any browser.
 
 ### 🔌 API contract
 
@@ -132,7 +130,7 @@ Entry plaintext (client only): `{issuer, label, secret, algorithm, digits, perio
 | Backend | FastAPI · SQLModel · SQLite · slowapi |
 | Crypto | Argon2id · XChaCha20-Poly1305 (libsodium) |
 | Web | React · Vite · PWA · libsodium-wrappers |
-| App | Kotlin · Jetpack Compose · lazysodium · CameraX · ML Kit |
+| App _(planned)_ | Kotlin · Jetpack Compose · lazysodium · CameraX · ML Kit |
 | Deploy | Docker (multi-stage) · GHCR · Unraid |
 
 ### 🛠️ Development
@@ -150,7 +148,8 @@ cd frontend && npm install && npm run dev   # http://localhost:5173, proxies /ap
 ### 🗺️ Roadmap
 
 - [x] **[HTTPS guide](docs/HTTPS.md)** (reverse proxy) → unlocks web camera + TWA
-- [x] **Encrypted export / backup** (password-protected, web ↔ app)
+- [x] **Encrypted export / backup** (password-protected, portable)
+- [ ] **Native Android app** (Kotlin + Compose, biometric unlock, native QR scanner)
 - [ ] Bulk import (Google Authenticator `otpauth-migration://`)
 - [ ] Optional passwords (vault schema is already generic)
 - [ ] Tests toward 80 % coverage
@@ -161,7 +160,7 @@ cd frontend && npm install && npm run dev   # http://localhost:5173, proxies /ap
 
 ## 🇩🇪 Deutsch
 
-Ein einzelner Docker-Container betreibt einen **2FA-/TOTP-Tresor** — die Web-Oberfläche **und** die API, mit der die native Android-App spricht. Deine TOTP-Geheimnisse liegen **Ende-zu-Ende verschlüsselt**; der Server sieht ausschließlich Ciphertext.
+Ein einzelner Docker-Container betreibt einen **2FA-/TOTP-Tresor** — die Web-Oberfläche **und** die API dahinter. Deine TOTP-Geheimnisse liegen **Ende-zu-Ende verschlüsselt**; der Server sieht ausschließlich Ciphertext.
 
 Teil der **Self**-Reihe (SelfMailer, SelfArchiver, SelfDashboard …) — gleiches Design-System, gleicher Deploy-Stil (GHCR → Unraid).
 
@@ -169,17 +168,15 @@ Teil der **Self**-Reihe (SelfMailer, SelfArchiver, SelfDashboard …) — gleich
 
 - 🔐 **Zero-Knowledge** — Geheimnisse werden auf deinem Gerät verschlüsselt; der Server kann sie nie lesen
 - 🌐 **Web-Oberfläche (PWA)** — installierbar, läuft in jedem Browser
-- 📱 **Native Android-App** — Kotlin + Jetpack Compose, redet direkt mit der API
-- 👆 **Biometrie-Entsperrung** — Fingerabdruck ersetzt das Master-Passwort in der App
-- 📷 **Nativer QR-Scanner** — Konten per Scan hinzufügen (auch über HTTP)
 - 🔄 **Mehrgeräte-Sync** — verschlüsselt, mit Revision pro Eintrag
-- 💾 **Verschlüsseltes Backup / Wiederherstellen** — passwortgeschützte Datei, zwischen Web & App austauschbar
+- 💾 **Verschlüsseltes Backup / Wiederherstellen** — passwortgeschützte Datei, geräteübergreifend austauschbar
 - 🐳 **Ein Container** — FastAPI + SQLite, keine externe Datenbank
 - 🎨 **Markentreu** — Self-Design-System, dunkel als Standard
+- 📱 **Native Android-App** — _geplant_ (Kotlin + Compose, Biometrie-Entsperrung, nativer QR-Scanner)
 
 ### 🛡️ Sicherheitsmodell (Zero-Knowledge)
 
-Der Server speichert **niemals** Klartext. Alle TOTP-Seeds werden **ausschließlich** im Client (Browser/App) ver- und entschlüsselt.
+Der Server speichert **niemals** Klartext. Alle TOTP-Seeds werden **ausschließlich** im Client (Browser) ver- und entschlüsselt.
 
 ```
 Master-Passwort ──Argon2id──► MasterKey   (verlässt das Gerät nie)
@@ -196,17 +193,17 @@ Master-Passwort ──Argon2id──► MasterKey   (verlässt das Gerät nie)
 - Der Server kennt nur: E-Mail, öffentlichen KDF-Salt, einen Argon2-Hash des AuthHash und undurchsichtige Ciphertext-Blobs → **DB-Diebstahl ergibt Datenmüll**
 - ⚠️ Das Master-Passwort lässt sich **nicht** zurücksetzen. Vergessen = die Codes sind unwiederbringlich verschlüsselt.
 
-**Härtung (v2.0.9):** Rate-Limiting auf Login/Registrierung, hart verdrahtete JWT-Algorithmen, serverseitige KDF-Mindestwerte, Security-Header + CSP, Längen-/ID-Limits. Android: `allowBackup=false`, JWT-Token im Android-Keystore. Geprüft mit dem ECC-Security-Reviewer.
+**Härtung (v2.0.9):** Rate-Limiting auf Login/Registrierung, hart verdrahtete JWT-Algorithmen, serverseitige KDF-Mindestwerte, Security-Header + CSP, Längen-/ID-Limits. Geprüft mit dem ECC-Security-Reviewer.
 
-**Härtung (v2.2.0):** kompletter Zeile-für-Zeile-Review von Container + App. Neu: Logout mit **serverseitiger JWT-Sperre** (Blocklist), **konstante Login-Zeit** (keine Account-Enumeration über Timing), rate-limitierte Vault-Endpunkte + Eintragslimit pro Nutzer, **Biometrie-Entsperrung an einen Android-Keystore-Schlüssel via `BiometricPrompt.CryptoObject` gebunden** (der Tresor-Schlüssel wird erst nach vom OS bestätigter Biometrie freigegeben, keine reine UI-Sperre), Key-Separation, **non-root-Container**, `Permissions-Policy`, Schlüssel-Nullen im Speicher.
+**Härtung (v2.2.0):** kompletter Zeile-für-Zeile-Review des Containers. Neu: Logout mit **serverseitiger JWT-Sperre** (Blocklist), **konstante Login-Zeit** (keine Account-Enumeration über Timing), rate-limitierte Vault-Endpunkte + Eintragslimit pro Nutzer, Key-Separation, **non-root-Container**, `Permissions-Policy`, Schlüssel-Nullen im Speicher.
 
 ### 🔒 Fernzugriff
 
 Der Container spricht reines **HTTP** und gehört in ein vertrauenswürdiges Netz. Wähle, was passt:
 
 - **Nur LAN** — im Heimnetz unter `http://<host>:8091` erreichbar.
-- **VPN (empfohlen für den privaten Einsatz)** — nichts öffentlich exponieren; die LAN-Adresse über WireGuard / Tailscale erreichen. Der Tunnel verschlüsselt bereits Ende-zu-Ende, reines HTTP ist also okay und die **native App läuft unverändert**.
-- **HTTPS-Reverse-Proxy** — für öffentliche Erreichbarkeit ohne VPN; siehe **[HTTPS-Anleitung](docs/HTTPS.md)**. Außerdem nötig, wenn du die **Web**-Kamera/Zwischenablage willst (Browser-Secure-Context); die native App braucht das nie.
+- **VPN (empfohlen für den privaten Einsatz)** — nichts öffentlich exponieren; die LAN-Adresse über WireGuard / Tailscale erreichen. Der Tunnel verschlüsselt bereits Ende-zu-Ende, reines HTTP ist also okay.
+- **HTTPS-Reverse-Proxy** — für öffentliche Erreichbarkeit ohne VPN; siehe **[HTTPS-Anleitung](docs/HTTPS.md)**. Außerdem nötig, wenn du die **Web**-Kamera/Zwischenablage willst (Browser-Secure-Context).
 
 ### 🚀 Schnellstart (Docker)
 
@@ -235,16 +232,16 @@ oder unter *Docker → Add Container → Template* importieren. **Master Secret*
 | `SELFAUTH_DB_PATH` | – | `/data/selfauthenticator.db` | SQLite-Pfad |
 | `PORT` | – | `8091` | Host-Port |
 
-### 📱 Android-App
+### 📱 Android-App (geplant)
 
-Ein echter nativer Authenticator (`android/SelfAuthenticator.apk`):
+Ein nativer Android-Authenticator steht auf der Roadmap — **noch nicht veröffentlicht** (keine APK in diesem Repo). Geplantes Design:
 
-- Redet **direkt** mit der API — keine eingebettete WebView, keine Cache-Probleme
+- Redet **direkt** mit derselben API — keine eingebettete WebView
 - **Gleiche libsodium-Krypto** wie das Web → derselbe Account/Tresor funktioniert überall
 - **Fingerabdruck-Entsperrung**, **nativer CameraX + ML-Kit QR-Scanner**, native Zwischenablage
 - Server-URL beim ersten Start eingeben
 
-APK installieren, öffnen, `http://<host>:8091` eingeben, einmal mit Master-Passwort einloggen — danach entsperrt der Fingerabdruck den Tresor direkt.
+Bis dahin die **Web-Oberfläche (PWA)** nutzen — installierbar und in jedem Browser lauffähig.
 
 ### 🔌 API-Contract
 
@@ -271,7 +268,7 @@ Eintrag-Klartext (nur im Client): `{issuer, label, secret, algorithm, digits, pe
 | Backend | FastAPI · SQLModel · SQLite · slowapi |
 | Krypto | Argon2id · XChaCha20-Poly1305 (libsodium) |
 | Web | React · Vite · PWA · libsodium-wrappers |
-| App | Kotlin · Jetpack Compose · lazysodium · CameraX · ML Kit |
+| App _(geplant)_ | Kotlin · Jetpack Compose · lazysodium · CameraX · ML Kit |
 | Deploy | Docker (Multi-Stage) · GHCR · Unraid |
 
 ### 🛠️ Entwicklung
@@ -289,7 +286,8 @@ cd frontend && npm install && npm run dev   # http://localhost:5173, proxyt /api
 ### 🗺️ Roadmap
 
 - [x] **[HTTPS-Anleitung](docs/HTTPS.md)** (Reverse-Proxy) → schaltet Web-Kamera + TWA frei
-- [x] **Verschlüsselter Export / Backup** (passwortgeschützt, Web ↔ App)
+- [x] **Verschlüsselter Export / Backup** (passwortgeschützt, portabel)
+- [ ] **Native Android-App** (Kotlin + Compose, Biometrie-Entsperrung, nativer QR-Scanner)
 - [ ] Massen-Import (Google-Authenticator `otpauth-migration://`)
 - [ ] Optionale Passwörter (Vault-Schema ist bereits generisch)
 - [ ] Tests Richtung 80 % Coverage
