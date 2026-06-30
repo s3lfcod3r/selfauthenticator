@@ -4,8 +4,8 @@ Flow:
   1. Client ruft /prelogin mit E-Mail -> bekommt kdf_salt + Argon2-Parameter.
   2. Client leitet lokal ab: MasterKey = Argon2id(master_pw, kdf_salt);
      AuthHash = BLAKE2b(MasterKey || master_pw). Nur AuthHash geht zum Server.
-  3. /register legt den Nutzer an (inkl. client-verschluesseltem protected_vault_key).
-  4. /login verifiziert den AuthHash und gibt JWT + protected_vault_key zurueck.
+  3. /register legt den Nutzer an (inkl. client-verschlüsseltem protected_vault_key).
+  4. /login verifiziert den AuthHash und gibt JWT + protected_vault_key zurück.
 
 Rate-Limiting bremst Brute-Force gegen /login & /register.
 """
@@ -137,7 +137,7 @@ def register(request: Request, body: RegisterIn, session: Session = Depends(get_
 def login(request: Request, body: LoginIn, session: Session = Depends(get_session)) -> TokenOut:
     user = _find_user(session, body.email)
     # Konstante Fehlermeldung egal ob E-Mail oder AuthHash falsch ist. verify_auth
-    # laeuft auch bei unbekanntem Account (stored=None) die volle Argon2-Pruefung
+    # läuft auch bei unbekanntem Account (stored=None) die volle Argon2-Prüfung
     # -> keine Timing-Unterscheidung "Konto existiert (nicht)".
     stored = user.auth_hash if user is not None else None
     if not security.verify_auth(stored, body.auth_hash):
@@ -164,13 +164,13 @@ def logout(
     creds: HTTPAuthorizationCredentials = Depends(security.bearer_scheme),
     session: Session = Depends(get_session),
 ) -> dict:
-    """Widerruft das vorgelegte JWT (Blocklist via jti). Abgelaufene Eintraege
-    werden bei dieser Gelegenheit aufgeraeumt, damit die Tabelle klein bleibt."""
+    """Widerruft das vorgelegte JWT (Blocklist via jti). Abgelaufene Einträge
+    werden bei dieser Gelegenheit aufgeräumt, damit die Tabelle klein bleibt."""
     now = datetime.now(timezone.utc)
     try:
         payload = security.decode_token(creds.credentials)
     except Exception:
-        # Bereits ungueltig/abgelaufen -> nichts zu tun.
+        # Bereits ungültig/abgelaufen -> nichts zu tun.
         return {"ok": True}
 
     jti = payload.get("jti")
@@ -180,7 +180,7 @@ def logout(
             exp = datetime.fromtimestamp(int(payload.get("exp", now.timestamp())), tz=timezone.utc)
             session.add(RevokedToken(jti=jti, expires_at=exp))
 
-    # Aufraeumen abgelaufener Blocklist-Eintraege, damit die Tabelle klein bleibt.
+    # Aufräumen abgelaufener Blocklist-Einträge, damit die Tabelle klein bleibt.
     for stale in session.exec(select(RevokedToken).where(RevokedToken.expires_at < now)).all():
         session.delete(stale)
     session.commit()

@@ -21,8 +21,8 @@ from .core.ratelimit import limiter
 
 settings = get_settings()
 
-# CSP fuer die PWA. 'wasm-unsafe-eval' ist noetig, weil libsodium per WebAssembly
-# laeuft; Google-Fonts-Hosts sind explizit erlaubt.
+# CSP für die PWA. 'wasm-unsafe-eval' ist nötig, weil libsodium per WebAssembly
+# läuft; Google-Fonts-Hosts sind explizit erlaubt.
 _CSP = (
     "default-src 'self'; "
     "script-src 'self' 'wasm-unsafe-eval'; "
@@ -44,7 +44,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
         response.headers["Content-Security-Policy"] = _CSP
-        # Hinweis: HSTS bewusst NICHT hier — die App wird im LAN auch ueber http
+        # Hinweis: HSTS bewusst NICHT hier — die App wird im LAN auch über http
         # genutzt; HSTS muss der TLS-terminierende Reverse-Proxy setzen (docs/HTTPS.md).
         return response
 

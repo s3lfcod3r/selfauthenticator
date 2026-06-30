@@ -1,7 +1,7 @@
 """Rate-Limiting (slowapi). Bremst Brute-Force gegen /login & /register.
 
 Eigenes Modul, damit Limiter sowohl in main.py (App-State/Handler) als auch in
-den Routern (Decorator) ohne zirkulaeren Import verfuegbar ist.
+den Routern (Decorator) ohne zirkulaeren Import verfügbar ist.
 """
 from __future__ import annotations
 

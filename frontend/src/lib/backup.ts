@@ -1,4 +1,4 @@
-// Verschluesseltes Export/Backup der Konten. Format ist plattform-kompatibel
+// Verschlüsseltes Export/Backup der Konten. Format ist plattform-kompatibel
 // zur nativen App: Argon2id(password, salt) -> Key, XChaCha20-Poly1305(JSON der
 // TotpData-Liste). Datei = JSON mit salt + data (nonce||ciphertext, base64).
 import { decryptJson, deriveMasterKey, encryptJson, generateSalt } from "./crypto";
@@ -8,7 +8,7 @@ import type { DecryptedEntry } from "./vault";
 const FORMAT = "selfauth-backup";
 const MEM_KIB = 65536;
 const OPS = 3;
-// Grenzen fuer KDF-Parameter aus einer (nicht vertrauenswuerdigen) Backup-Datei,
+// Grenzen für KDF-Parameter aus einer (nicht vertrauenswürdigen) Backup-Datei,
 // damit ein manipuliertes mem_kib nicht den Tab per OOM lahmlegt.
 const MIN_MEM_KIB = 8192;
 const MAX_MEM_KIB = 1048576; // 1 GiB
@@ -52,7 +52,7 @@ export async function parseBackup(text: string, password: string): Promise<TotpD
   try {
     file = JSON.parse(text) as BackupFile;
   } catch {
-    throw new Error("Datei ist kein gueltiges JSON.");
+    throw new Error("Datei ist kein gültiges JSON.");
   }
   if (file.format !== FORMAT || !file.salt || !file.data) {
     throw new Error("Keine SelfAuthenticator-Backup-Datei.");
@@ -65,6 +65,6 @@ export async function parseBackup(text: string, password: string): Promise<TotpD
     if (!Array.isArray(list)) throw new Error("bad");
     return list;
   } catch {
-    throw new Error("Falsches Backup-Passwort oder beschaedigte Datei.");
+    throw new Error("Falsches Backup-Passwort oder beschädigte Datei.");
   }
 }

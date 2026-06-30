@@ -1,4 +1,4 @@
-// Duenner Fetch-Wrapper gegen /api. Dasselbe Contract nutzt spaeter das APK.
+// Duenner Fetch-Wrapper gegen /api. Dasselbe Contract nutzt später das APK.
 const BASE = "/api";
 const TOKEN_KEY = "selfauth_token";
 
