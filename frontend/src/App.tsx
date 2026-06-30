@@ -5,10 +5,12 @@ import { loadEntries, type DecryptedEntry, type Session } from "./lib/vault";
 import { getToken, setToken } from "./lib/api";
 import { keyFromB64, keyToB64 } from "./lib/crypto";
 import { nativeClearVaultKey, nativeGetVaultKey, nativeSaveVaultKey } from "./lib/native";
+import { useLang } from "./lib/i18n";
 
 type Phase = "locked" | "unlocking" | "unlocked";
 
 export function App() {
+  const { t } = useLang();
   const [phase, setPhase] = useState<Phase>("locked");
   const [session, setSession] = useState<Session | null>(null);
   const [entries, setEntries] = useState<DecryptedEntry[]>([]);
@@ -29,7 +31,7 @@ export function App() {
         /* kein nativer Host */
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Konnte Tresor nicht laden");
+      setError(e instanceof Error ? e.message : t("Konnte Tresor nicht laden"));
       setPhase("locked");
     }
   }, []);

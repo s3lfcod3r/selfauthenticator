@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { currentCode, formatCode, type TotpData } from "../lib/totp";
 import { nativeCopy } from "../lib/native";
 import type { DecryptedEntry } from "../lib/vault";
+import { useLang } from "../lib/i18n";
 
 interface Props {
   entry: DecryptedEntry;
@@ -27,6 +28,7 @@ export function TokenCard({
   dragging,
   onDragStart,
 }: Props) {
+  const { t } = useLang();
   const [copied, setCopied] = useState(false);
   const data: TotpData = entry.data;
 
@@ -58,14 +60,14 @@ export function TokenCard({
     : undefined;
 
   return (
-    <div className={`token-card${dragging ? " dragging" : ""}`} onClick={copy} title="Antippen zum Kopieren">
+    <div className={`token-card${dragging ? " dragging" : ""}`} onClick={copy} title={t("Antippen zum Kopieren")}>
       {dragEnabled && (
         <button
           className="token-drag"
           onPointerDown={onDragStart}
           onClick={(e) => e.stopPropagation()}
-          title="Zum Sortieren ziehen"
-          aria-label="Zum Sortieren ziehen"
+          title={t("Zum Sortieren ziehen")}
+          aria-label={t("Zum Sortieren ziehen")}
         >
           ⠿
         </button>
@@ -76,7 +78,7 @@ export function TokenCard({
       <div className="token-meta">
         <div className="token-issuer">
           {data.favorite && <span className="token-star-tag" aria-hidden>★</span>}
-          {data.issuer || data.label || "Konto"}
+          {data.issuer || data.label || t("Konto")}
         </div>
         {data.label && data.issuer && <div className="token-label">{data.label}</div>}
       </div>
@@ -103,8 +105,8 @@ export function TokenCard({
               e.stopPropagation();
               onToggleFavorite();
             }}
-            title={data.favorite ? "Nicht mehr anheften" : "Anheften"}
-            aria-label="Anheften"
+            title={data.favorite ? t("Nicht mehr anheften") : "Anheften"}
+            aria-label={t("Anheften")}
           >
             {data.favorite ? "★" : "☆"}
           </button>
@@ -114,8 +116,8 @@ export function TokenCard({
               e.stopPropagation();
               onEdit();
             }}
-            title="Bearbeiten"
-            aria-label="Bearbeiten"
+            title={t("Bearbeiten")}
+            aria-label={t("Bearbeiten")}
           >
             ✎
           </button>
@@ -125,8 +127,8 @@ export function TokenCard({
               e.stopPropagation();
               onDelete();
             }}
-            title="Entfernen"
-            aria-label="Entfernen"
+            title={t("Entfernen")}
+            aria-label={t("Entfernen")}
           >
             ✕
           </button>

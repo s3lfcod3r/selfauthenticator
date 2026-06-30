@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { DecryptedEntry } from "../lib/vault";
 import type { TotpData } from "../lib/totp";
+import { useLang } from "../lib/i18n";
 
 interface Props {
   entry: DecryptedEntry;
@@ -27,6 +28,7 @@ const EMOJIS = [
 ];
 
 export function EditAccount({ entry, onSave, onClose }: Props) {
+  const { t } = useLang();
   const [issuer, setIssuer] = useState(entry.data.issuer);
   const [label, setLabel] = useState(entry.data.label);
   const [color, setColor] = useState<string | undefined>(entry.data.color);
@@ -36,7 +38,7 @@ export function EditAccount({ entry, onSave, onClose }: Props) {
   function save() {
     setError(null);
     if (!issuer.trim() && !label.trim()) {
-      return setError("Bitte einen Anbieter oder ein Label angeben.");
+      return setError(t("Bitte einen Anbieter oder ein Label angeben."));
     }
     onSave({
       issuer: issuer.trim(),
@@ -49,27 +51,27 @@ export function EditAccount({ entry, onSave, onClose }: Props) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>Eintrag bearbeiten</h2>
+        <h2>{t("Eintrag bearbeiten")}</h2>
 
         {error && <div className="auth-error">{error}</div>}
 
         <div className="field">
-          <label>Anbieter (Issuer)</label>
-          <input value={issuer} onChange={(e) => setIssuer(e.target.value)} placeholder="z. B. GitHub" />
+          <label>{t("Anbieter (Issuer)")}</label>
+          <input value={issuer} onChange={(e) => setIssuer(e.target.value)} placeholder={t("z. B. GitHub")} />
         </div>
         <div className="field">
-          <label>Konto / Label (optional)</label>
-          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="z. B. sven@…" />
+          <label>{t("Konto / Label (optional)")}</label>
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder={t("z. B. sven@…")} />
         </div>
 
         <div className="field">
-          <label>Symbol</label>
+          <label>{t("Symbol")}</label>
           <div className="emoji-grid">
             <button
               type="button"
               className={`emoji-cell${!icon ? " active" : ""}`}
               onClick={() => setIcon(undefined)}
-              title="Kein Symbol (Anfangsbuchstabe)"
+              title={t("Kein Symbol (Anfangsbuchstabe)")}
             >
               Aa
             </button>
@@ -87,7 +89,7 @@ export function EditAccount({ entry, onSave, onClose }: Props) {
         </div>
 
         <div className="field">
-          <label>Farbe</label>
+          <label>{t("Farbe")}</label>
           <div className="swatch-row">
             {COLORS.map((c) => (
               <button
@@ -103,8 +105,8 @@ export function EditAccount({ entry, onSave, onClose }: Props) {
         </div>
 
         <div className="modal-actions">
-          <button className="ghost" onClick={onClose}>Abbrechen</button>
-          <button className="primary" onClick={save}>Speichern</button>
+          <button className="ghost" onClick={onClose}>{t("Abbrechen")}</button>
+          <button className="primary" onClick={save}>{t("Speichern")}</button>
         </div>
       </div>
     </div>

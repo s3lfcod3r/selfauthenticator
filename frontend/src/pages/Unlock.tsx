@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, ApiError } from "../lib/api";
 import { register, unlock, type Session } from "../lib/vault";
+import { useLang, LangPicker } from "../lib/i18n";
 
 interface Props {
   onUnlocked: (s: Session) => void;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function Unlock({ onUnlocked, busy, externalError }: Props) {
+  const { t } = useLang();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [allowRegister, setAllowRegister] = useState(true);
   const [email, setEmail] = useState("");
@@ -32,16 +34,16 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
     e.preventDefault();
     setError(null);
     if (!email || !password) {
-      setError("E-Mail und Master-Passwort sind erforderlich.");
+      setError(t("E-Mail und Master-Passwort sind erforderlich."));
       return;
     }
     if (mode === "register") {
       if (password.length < 8) {
-        setError("Master-Passwort muss mindestens 8 Zeichen haben.");
+        setError(t("Master-Passwort muss mindestens 8 Zeichen haben."));
         return;
       }
       if (password !== confirm) {
-        setError("Die Passwörter stimmen nicht überein.");
+        setError(t("Die Passwörter stimmen nicht überein."));
         return;
       }
     }
@@ -51,7 +53,7 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
       onUnlocked(session);
     } catch (err) {
       if (err instanceof ApiError) setError(err.message);
-      else setError(err instanceof Error ? err.message : "Unbekannter Fehler");
+      else setError(err instanceof Error ? err.message : t("Unbekannter Fehler"));
     } finally {
       setWorking(false);
     }
@@ -62,18 +64,21 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
   return (
     <div className="auth-wrap">
       <form className="auth-card" onSubmit={submit}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <LangPicker className="lang-select" />
+        </div>
         <img className="auth-logo" src="/shield.png" alt="" />
         <h1 className="wordmark">
           <span className="ice">Self</span><span className="accent">Authenticator</span>
         </h1>
         <p className="auth-sub">
-          {mode === "register" ? "Neuen Tresor anlegen" : "Tresor entsperren"} · Zero-Knowledge 2FA
+          {mode === "register" ? t("Neuen Tresor anlegen") : t("Tresor entsperren")} · Zero-Knowledge 2FA
         </p>
 
         {(error || externalError) && <div className="auth-error">{error || externalError}</div>}
 
         <div className="field">
-          <label htmlFor="email">E-Mail</label>
+          <label htmlFor="email">{t("E-Mail")}</label>
           <input
             id="email"
             type="email"
@@ -84,7 +89,7 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
           />
         </div>
         <div className="field">
-          <label htmlFor="pw">Master-Passwort</label>
+          <label htmlFor="pw">{t("Master-Passwort")}</label>
           <input
             id="pw"
             type="password"
@@ -96,7 +101,7 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
         </div>
         {mode === "register" && (
           <div className="field">
-            <label htmlFor="pw2">Master-Passwort wiederholen</label>
+            <label htmlFor="pw2">{t("Master-Passwort wiederholen")}</label>
             <input
               id="pw2"
               type="password"
@@ -109,31 +114,22 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
         )}
 
         <button className="primary" type="submit" disabled={isBusy} style={{ width: "100%", marginTop: "0.4rem" }}>
-          {isBusy ? "Bitte warten…" : mode === "register" ? "Tresor erstellen" : "Entsperren"}
+          {isBusy ? t("Bitte warten…") : mode === "register" ? t("Tresor erstellen") : t("Entsperren")}
         </button>
 
         {mode === "register" && (
           <p className="hint">
-            Das Master-Passwort verlässt dein Gerät nie und kann nicht zurückgesetzt werden.
-            Vergisst du es, sind die Codes unwiederbringlich verschlüsselt.
+            {t("Das Master-Passwort verlässt dein Gerät nie und kann nicht zurückgesetzt werden. Vergisst du es, sind die Codes unwiederbringlich verschlüsselt.")}
           </p>
         )}
 
         {allowRegister && (
           <div className="auth-toggle">
             {mode === "login" ? (
-              <>
-                Noch kein Tresor?
-                <button type="button" onClick={() => setMode("register")}>
-                  Registrieren
-                </button>
+              <>{t("Noch kein Tresor?")}<button type="button" onClick={() => setMode("register")}>{t("Registrieren")}</button>
               </>
             ) : (
-              <>
-                Schon registriert?
-                <button type="button" onClick={() => setMode("login")}>
-                  Anmelden
-                </button>
+              <>{t("Schon registriert?")}<button type="button" onClick={() => setMode("login")}>{t("Anmelden")}</button>
               </>
             )}
           </div>

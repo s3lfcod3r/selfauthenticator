@@ -310,3 +310,15 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
   cursor: pointer;
 }
 .swatch.active { border-color: var(--self-text); }
+
+/* Sprachwähler (12 Sprachen) */
+.lang-select {
+  background: var(--self-bg-3);
+  color: var(--self-text);
+  border: 1px solid var(--self-line);
+  border-radius: var(--self-radius-sm);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.lang-select:hover, .lang-select:focus { border-color: var(--self-teal); outline: none; }

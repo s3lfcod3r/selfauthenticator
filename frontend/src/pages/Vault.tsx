@@ -5,6 +5,7 @@ import { EditAccount } from "../components/EditAccount";
 import { BackupModal } from "../components/BackupModal";
 import { addEntry, deleteEntry, updateEntry, type DecryptedEntry, type Session } from "../lib/vault";
 import { parseOtpauthUri, type TotpData } from "../lib/totp";
+import { useLang, LangPicker } from "../lib/i18n";
 
 interface Props {
   session: Session;
@@ -46,6 +47,7 @@ function sortEntries(list: DecryptedEntry[], mode: SortMode): DecryptedEntry[] {
 }
 
 export function VaultView({ session, entries, setEntries, onLock }: Props) {
+  const { t } = useLang();
   const [tick, setTick] = useState(0);
   const [query, setQuery] = useState("");
   const [adding, setAdding] = useState(false);
@@ -90,11 +92,11 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       try {
         data = parseOtpauthUri(uri);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "QR ungültig");
+        setError(e instanceof Error ? e.message : t("QR ungültig"));
         return;
       }
       handleAdd(data).catch((e) =>
-        setError(e instanceof Error ? e.message : "Hinzufügen fehlgeschlagen"),
+        setError(e instanceof Error ? e.message : t("Hinzufügen fehlgeschlagen")),
       );
     };
     return () => {
@@ -125,20 +127,20 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       setEntries((prev) => [...prev, entry]);
       setAdding(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Hinzufügen fehlgeschlagen");
+      setError(e instanceof Error ? e.message : t("Hinzufügen fehlgeschlagen"));
     }
   }
 
   async function handleDelete(id: string) {
     const target = entries.find((e) => e.id === id);
-    const name = target ? target.data.issuer || target.data.label : "diesen Eintrag";
+    const name = target ? target.data.issuer || target.data.label : t("diesen Eintrag");
     if (!confirm(`"${name}" wirklich entfernen?`)) return;
     setError(null);
     try {
       await deleteEntry(id);
       setEntries((prev) => prev.filter((e) => e.id !== id));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Löschen fehlgeschlagen");
+      setError(e instanceof Error ? e.message : t("Löschen fehlgeschlagen"));
     }
   }
 
@@ -153,7 +155,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       setEntries((prev) => [...prev, ...added]);
       setBackup(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Import fehlgeschlagen");
+      setError(e instanceof Error ? e.message : t("Import fehlgeschlagen"));
     }
   }
 
@@ -165,7 +167,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       setEntries((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
       setEditing(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Speichern fehlgeschlagen");
+      setError(e instanceof Error ? e.message : t("Speichern fehlgeschlagen"));
     }
   }
 
@@ -183,7 +185,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       setEntries((prev) =>
         prev.map((p) => (p.id === entry.id ? { ...p, data: { ...p.data, favorite: !fav } } : p)),
       );
-      setError(e instanceof Error ? e.message : "Anheften fehlgeschlagen");
+      setError(e instanceof Error ? e.message : t("Anheften fehlgeschlagen"));
     }
   }
 
@@ -237,7 +239,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
           const updated = await updateEntry(session.vaultKey, e, { order: e.data.order });
           setEntries((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
         } catch (err) {
-          setError(err instanceof Error ? err.message : "Reihenfolge speichern fehlgeschlagen");
+          setError(err instanceof Error ? err.message : t("Reihenfolge speichern fehlgeschlagen"));
         }
       }
     }
@@ -267,12 +269,9 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
           </span>
         </span>
         <div className="actions">
-          <button className="ghost" onClick={() => setBackup(true)} title="Backup / Wiederherstellen">
-            Backup
-          </button>
-          <button className="ghost" onClick={onLock} title="Tresor sperren">
-            Sperren
-          </button>
+          <LangPicker className="lang-select" />
+          <button className="ghost" onClick={() => setBackup(true)} title={t("Backup / Wiederherstellen")}>{t("Backup")}</button>
+          <button className="ghost" onClick={onLock} title={t("Tresor sperren")}>{t("Sperren")}</button>
         </div>
       </header>
 
@@ -281,21 +280,15 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
           {entries.length > 3 && (
             <input
               className="search-input"
-              placeholder="Suchen…"
+              placeholder={t("Suchen…")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           )}
-          <div className="sort-toggle" role="group" aria-label="Sortierung">
-            <button className={sortMode === "manual" ? "active" : ""} onClick={() => changeSort("manual")} title="Eigene Reihenfolge (ziehen)">
-              Eigene
-            </button>
-            <button className={sortMode === "az" ? "active" : ""} onClick={() => changeSort("az")}>
-              A–Z
-            </button>
-            <button className={sortMode === "za" ? "active" : ""} onClick={() => changeSort("za")}>
-              Z–A
-            </button>
+          <div className="sort-toggle" role="group" aria-label={t("Sortierung")}>
+            <button className={sortMode === "manual" ? "active" : ""} onClick={() => changeSort("manual")} title={t("Eigene Reihenfolge (ziehen)")}>{t("Eigene")}</button>
+            <button className={sortMode === "az" ? "active" : ""} onClick={() => changeSort("az")}>{t("A–Z")}</button>
+            <button className={sortMode === "za" ? "active" : ""} onClick={() => changeSort("za")}>{t("Z–A")}</button>
           </div>
         </div>
       )}
@@ -305,8 +298,8 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       {visible.length === 0 ? (
         <div className="empty">
           {entries.length === 0
-            ? "Noch keine Konten. Tippe auf +, um dein erstes 2FA-Konto hinzuzufügen."
-            : "Keine Treffer."}
+            ? t("Noch keine Konten. Tippe auf +, um dein erstes 2FA-Konto hinzuzufügen.")
+            : t("Keine Treffer.")}
         </div>
       ) : (
         visible.map((e) => (
@@ -331,7 +324,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
         ))
       )}
 
-      <button className="fab" onClick={() => setAdding(true)} aria-label="Konto hinzufügen">
+      <button className="fab" onClick={() => setAdding(true)} aria-label={t("Konto hinzufügen")}>
         +
       </button>
 
