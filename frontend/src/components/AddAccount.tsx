@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { normalizeSecret, parseOtpauthUri, validSecret, type TotpData } from "../lib/totp";
 import { hasNativeScanner, nativeScan } from "../lib/native";
+import { useLang } from "../lib/i18n";
 
 type Tab = "scan" | "uri" | "manual";
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function AddAccount({ onAdd, onClose }: Props) {
+  const { t } = useLang();
   const [tab, setTab] = useState<Tab>("manual");
   const [error, setError] = useState<string | null>(null);
 
@@ -25,14 +27,14 @@ export function AddAccount({ onAdd, onClose }: Props) {
     try {
       onAdd(parseOtpauthUri(uri));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Ungültige otpauth-URI");
+      setError(e instanceof Error ? e.message : t("Ungültige otpauth-URI"));
     }
   }
 
   function submitManual() {
     setError(null);
-    if (!issuer.trim()) return setError("Anbieter/Name ist erforderlich.");
-    if (!validSecret(secret)) return setError("Secret ist kein gültiger Base32-Schlüssel.");
+    if (!issuer.trim()) return setError(t("Anbieter/Name ist erforderlich."));
+    if (!validSecret(secret)) return setError(t("Secret ist kein gültiger Base32-Schlüssel."));
     onAdd({
       issuer: issuer.trim(),
       label: label.trim(),
@@ -46,17 +48,13 @@ export function AddAccount({ onAdd, onClose }: Props) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>Konto hinzufügen</h2>
+        <h2>{t("Konto hinzufügen")}</h2>
         <div className="tabs">
-          <button className={tab === "manual" ? "active" : ""} onClick={() => setTab("manual")}>
-            Manuell
-          </button>
+          <button className={tab === "manual" ? "active" : ""} onClick={() => setTab("manual")}>{t("Manuell")}</button>
           <button className={tab === "uri" ? "active" : ""} onClick={() => setTab("uri")}>
             otpauth-URI
           </button>
-          <button className={tab === "scan" ? "active" : ""} onClick={() => setTab("scan")}>
-            QR scannen
-          </button>
+          <button className={tab === "scan" ? "active" : ""} onClick={() => setTab("scan")}>{t("QR scannen")}</button>
         </div>
 
         {error && <div className="auth-error">{error}</div>}
@@ -64,20 +62,20 @@ export function AddAccount({ onAdd, onClose }: Props) {
         {tab === "manual" && (
           <>
             <div className="field">
-              <label>Anbieter (Issuer)</label>
-              <input value={issuer} onChange={(e) => setIssuer(e.target.value)} placeholder="z. B. GitHub" />
+              <label>{t("Anbieter (Issuer)")}</label>
+              <input value={issuer} onChange={(e) => setIssuer(e.target.value)} placeholder={t("z. B. GitHub")} />
             </div>
             <div className="field">
-              <label>Konto / Label (optional)</label>
-              <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="z. B. sven@…" />
+              <label>{t("Konto / Label (optional)")}</label>
+              <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder={t("z. B. sven@…")} />
             </div>
             <div className="field">
-              <label>Secret (Base32)</label>
+              <label>{t("Secret (Base32)")}</label>
               <input value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="JBSWY3DPEHPK3PXP" autoCapitalize="characters" />
             </div>
             <div className="modal-actions">
-              <button className="ghost" onClick={onClose}>Abbrechen</button>
-              <button className="primary" onClick={submitManual}>Hinzufügen</button>
+              <button className="ghost" onClick={onClose}>{t("Abbrechen")}</button>
+              <button className="primary" onClick={submitManual}>{t("Hinzufügen")}</button>
             </div>
           </>
         )}
@@ -88,10 +86,10 @@ export function AddAccount({ onAdd, onClose }: Props) {
               <label>otpauth:// URI</label>
               <input value={uri} onChange={(e) => setUri(e.target.value)} placeholder="otpauth://totp/…" />
             </div>
-            <p className="hint">Aus „Schlüssel manuell exportieren" der jeweiligen App, oder QR-Inhalt einfügen.</p>
+            <p className="hint">{t("Aus „Schlüssel manuell exportieren\" der jeweiligen App, oder QR-Inhalt einfügen.")}</p>
             <div className="modal-actions">
-              <button className="ghost" onClick={onClose}>Abbrechen</button>
-              <button className="primary" onClick={submitUri}>Hinzufügen</button>
+              <button className="ghost" onClick={onClose}>{t("Abbrechen")}</button>
+              <button className="primary" onClick={submitUri}>{t("Hinzufügen")}</button>
             </div>
           </>
         )}
@@ -99,14 +97,14 @@ export function AddAccount({ onAdd, onClose }: Props) {
         {tab === "scan" &&
           (hasNativeScanner() ? (
             <>
-              <p className="hint">Tippe auf „Kamera öffnen" und halte den QR-Code des Kontos in den Rahmen.</p>
+              <p className="hint">{t("Tippe auf „Kamera öffnen\" und halte den QR-Code des Kontos in den Rahmen.")}</p>
               <div className="modal-actions">
-                <button className="ghost" onClick={onClose}>Abbrechen</button>
-                <button className="primary" onClick={() => nativeScan()}>Kamera öffnen</button>
+                <button className="ghost" onClick={onClose}>{t("Abbrechen")}</button>
+                <button className="primary" onClick={() => nativeScan()}>{t("Kamera öffnen")}</button>
               </div>
             </>
           ) : (
-            <QrScan onText={(t) => { setUri(t); try { onAdd(parseOtpauthUri(t)); } catch (e) { setError(e instanceof Error ? e.message : "QR ungültig"); setTab("uri"); } }} onError={(m) => { setError(m); setTab("uri"); }} onClose={onClose} />
+            <QrScan onText={(txt) => { setUri(txt); try { onAdd(parseOtpauthUri(txt)); } catch (e) { setError(e instanceof Error ? e.message : t("QR ungültig")); setTab("uri"); } }} onError={(m) => { setError(m); setTab("uri"); }} onClose={onClose} />
           ))}
       </div>
     </div>
@@ -114,6 +112,7 @@ export function AddAccount({ onAdd, onClose }: Props) {
 }
 
 function QrScan({ onText, onError, onClose }: { onText: (t: string) => void; onError: (m: string) => void; onClose: () => void }) {
+  const { t } = useLang();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -143,9 +142,9 @@ function QrScan({ onText, onError, onClose }: { onText: (t: string) => void; onE
   return (
     <>
       <video ref={videoRef} className="scan-video" muted playsInline />
-      <p className="hint">QR-Code der Authenticator-Einrichtung vor die Kamera halten.</p>
+      <p className="hint">{t("QR-Code der Authenticator-Einrichtung vor die Kamera halten.")}</p>
       <div className="modal-actions">
-        <button className="ghost" onClick={onClose}>Abbrechen</button>
+        <button className="ghost" onClick={onClose}>{t("Abbrechen")}</button>
       </div>
     </>
   );

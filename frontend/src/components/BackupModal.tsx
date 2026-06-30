@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { buildBackup, parseBackup } from "../lib/backup";
 import type { DecryptedEntry } from "../lib/vault";
 import type { TotpData } from "../lib/totp";
+import { useLang } from "../lib/i18n";
 
 interface Props {
   entries: DecryptedEntry[];
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function BackupModal({ entries, onImport, onClose }: Props) {
+  const { t } = useLang();
   const [tab, setTab] = useState<"export" | "import">("export");
   const [pw, setPw] = useState("");
   const [busy, setBusy] = useState(false);
@@ -28,8 +30,8 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
   async function doExport() {
     setError(null);
     setInfo(null);
-    if (pw.length < 8) return setError("Backup-Passwort: mindestens 8 Zeichen.");
-    if (entries.length === 0) return setError("Keine Konten zum Sichern.");
+    if (pw.length < 8) return setError(t("Backup-Passwort: mindestens 8 Zeichen."));
+    if (entries.length === 0) return setError(t("Keine Konten zum Sichern."));
     setBusy(true);
     try {
       const json = await buildBackup(entries, pw);
@@ -41,9 +43,9 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
       a.download = `selfauth-backup-${stamp}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      setInfo("Backup heruntergeladen. Datei UND Passwort sicher aufbewahren.");
+      setInfo(t("Backup heruntergeladen. Datei UND Passwort sicher aufbewahren."));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Export fehlgeschlagen");
+      setError(e instanceof Error ? e.message : t("Export fehlgeschlagen"));
     } finally {
       setBusy(false);
     }
@@ -60,14 +62,14 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
 
   async function doImport() {
     setError(null);
-    if (!fileText) return setError("Bitte zuerst eine Backup-Datei wählen.");
-    if (!pw) return setError("Backup-Passwort eingeben.");
+    if (!fileText) return setError(t("Bitte zuerst eine Backup-Datei wählen."));
+    if (!pw) return setError(t("Backup-Passwort eingeben."));
     setBusy(true);
     try {
       const list = await parseBackup(fileText, pw);
       onImport(list);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Import fehlgeschlagen");
+      setError(e instanceof Error ? e.message : t("Import fehlgeschlagen"));
     } finally {
       setBusy(false);
     }
@@ -76,14 +78,10 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(ev) => ev.stopPropagation()}>
-        <h2>Backup</h2>
+        <h2>{t("Backup")}</h2>
         <div className="tabs">
-          <button className={tab === "export" ? "active" : ""} onClick={() => switchTab("export")}>
-            Exportieren
-          </button>
-          <button className={tab === "import" ? "active" : ""} onClick={() => switchTab("import")}>
-            Importieren
-          </button>
+          <button className={tab === "export" ? "active" : ""} onClick={() => switchTab("export")}>{t("Exportieren")}</button>
+          <button className={tab === "import" ? "active" : ""} onClick={() => switchTab("import")}>{t("Importieren")}</button>
         </div>
 
         {error && <div className="auth-error">{error}</div>}
@@ -96,28 +94,28 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
               kannst du sie jederzeit (auch in der App) wiederherstellen.
             </p>
             <div className="field">
-              <label>Backup-Passwort</label>
+              <label>{t("Backup-Passwort")}</label>
               <input
                 type="password"
                 autoComplete="new-password"
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
-                placeholder="mind. 8 Zeichen"
+                placeholder={t("mind. 8 Zeichen")}
               />
             </div>
             <div className="modal-actions">
-              <button className="ghost" onClick={onClose}>Schließen</button>
+              <button className="ghost" onClick={onClose}>{t("Schließen")}</button>
               <button className="primary" onClick={doExport} disabled={busy}>
-                {busy ? "…" : "Herunterladen"}
+                {busy ? "…" : t("Herunterladen")}
               </button>
             </div>
           </>
         ) : (
           <>
-            <p className="hint">Backup-Datei wählen und Backup-Passwort eingeben — Konten werden hinzugefügt.</p>
+            <p className="hint">{t("Backup-Datei wählen und Backup-Passwort eingeben — Konten werden hinzugefügt.")}</p>
             <div className="field">
               <button className="ghost" onClick={() => fileRef.current?.click()}>
-                {fileName || "Datei wählen…"}
+                {fileName || t("Datei wählen…")}
               </button>
               <input
                 ref={fileRef}
@@ -128,11 +126,11 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
               />
             </div>
             <div className="field">
-              <label>Backup-Passwort</label>
+              <label>{t("Backup-Passwort")}</label>
               <input type="password" autoComplete="off" value={pw} onChange={(e) => setPw(e.target.value)} />
             </div>
             <div className="modal-actions">
-              <button className="ghost" onClick={onClose}>Schließen</button>
+              <button className="ghost" onClick={onClose}>{t("Schließen")}</button>
               <button className="primary" onClick={doImport} disabled={busy}>
                 {busy ? "…" : "Importieren"}
               </button>
