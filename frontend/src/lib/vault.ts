@@ -91,6 +91,17 @@ export async function addEntry(vaultKey: Uint8Array, data: TotpData): Promise<De
   return { id: res.id, revision: res.revision, data };
 }
 
+export async function updateEntry(
+  vaultKey: Uint8Array,
+  entry: DecryptedEntry,
+  patch: Partial<TotpData>,
+): Promise<DecryptedEntry> {
+  const data = { ...entry.data, ...patch };
+  const ciphertext = await encryptJson(data, vaultKey);
+  const res = await api.upsert({ id: entry.id, ciphertext, base_revision: entry.revision });
+  return { id: res.id, revision: res.revision, data };
+}
+
 export async function deleteEntry(id: string): Promise<void> {
   await api.remove(id);
 }

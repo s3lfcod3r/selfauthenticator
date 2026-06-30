@@ -9,6 +9,13 @@ export interface TotpData {
   algorithm: string; // SHA1 | SHA256 | SHA512
   digits: number;
   period: number;
+  // --- Optionale Darstellungs-/Sortier-Metadaten ---
+  // Werden im verschluesselten Eintrag mitgespeichert (Zero-Knowledge bleibt
+  // erhalten) und von der Code-Berechnung ignoriert.
+  color?: string; // Akzentfarbe als 6-stelliger Hex (#33a78c)
+  icon?: string; // Emoji als Symbol
+  favorite?: boolean; // oben angeheftet
+  order?: number; // manuelle Reihenfolge (kleiner = weiter oben)
 }
 
 export function normalizeSecret(raw: string): string {

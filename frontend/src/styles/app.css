@@ -102,6 +102,34 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
 .topbar .actions { display: flex; gap: 0.5rem; }
 .search { margin-bottom: 1rem; }
 
+/* ---------- Toolbar: Suche + Sortierung ---------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.toolbar .search-input { flex: 1; min-width: 140px; }
+.sort-toggle {
+  display: inline-flex;
+  border: 1px solid var(--self-line);
+  border-radius: var(--self-radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.sort-toggle button {
+  border: none;
+  border-radius: 0;
+  background: var(--self-bg-2);
+  padding: 0.5rem 0.7rem;
+  font-size: 0.82rem;
+  color: var(--self-text-2);
+}
+.sort-toggle button + button { border-left: 1px solid var(--self-line); }
+.sort-toggle button.active { background: var(--self-teal-deep); color: var(--self-text); }
+.sort-toggle button:hover { color: var(--self-teal-bright); }
+
 .empty {
   text-align: center;
   color: var(--self-text-2);
@@ -124,7 +152,28 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
   transition: border-color var(--self-dur-fast) var(--self-ease);
 }
 .token-card:hover { border-color: var(--self-line-strong); }
+.token-card.dragging {
+  border-color: var(--self-teal);
+  box-shadow: var(--self-glow-teal);
+  opacity: 0.97;
+  cursor: grabbing;
+  transition: none;
+}
+.token-drag {
+  background: none;
+  border: none;
+  color: var(--self-text-3);
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.2rem 0.1rem;
+  margin: -0.2rem -0.3rem -0.2rem -0.2rem;
+  cursor: grab;
+  touch-action: none;
+  flex-shrink: 0;
+}
+.token-drag:hover { color: var(--self-teal-bright); border-color: transparent; }
 .token-meta { flex: 1; min-width: 0; }
+.token-star-tag { color: var(--self-yellow); font-size: 0.8em; margin-right: 0.3rem; }
 .token-issuer { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .token-label { font-size: 0.78rem; color: var(--self-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .token-code {
@@ -134,9 +183,21 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
   color: var(--self-teal-bright);
 }
 .token-code.copied { color: var(--self-cyan); }
-.token-right { display: flex; align-items: center; gap: 0.7rem; }
-.token-del { background: none; border: none; color: var(--self-text-3); padding: 0.2rem; }
-.token-del:hover { color: var(--self-red); }
+.token-right { display: flex; align-items: center; gap: 0.6rem; }
+.token-tools { display: flex; flex-direction: column; gap: 0.1rem; }
+.token-tools button {
+  background: none;
+  border: none;
+  color: var(--self-text-3);
+  padding: 0.12rem 0.2rem;
+  font-size: 0.95rem;
+  line-height: 1;
+  border-radius: var(--self-radius-sm);
+}
+.token-fav.on { color: var(--self-yellow); }
+.token-fav:hover { color: var(--self-yellow); border-color: transparent; }
+.token-edit:hover { color: var(--self-teal-bright); border-color: transparent; }
+.token-del:hover { color: var(--self-red); border-color: transparent; }
 
 .ring { width: 34px; height: 34px; transform: rotate(-90deg); }
 .ring circle { fill: none; stroke-width: 3; }
@@ -218,3 +279,34 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
 .auth-card .wordmark,
 .auth-card .auth-sub,
 .auth-card .app-version { text-align: center; }
+
+/* ---------- Bearbeiten: Symbol- + Farbauswahl ---------- */
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.35rem;
+}
+@media (max-width: 420px) {
+  .emoji-grid { grid-template-columns: repeat(6, 1fr); }
+}
+.emoji-cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  padding: 0;
+  background: var(--self-bg-3);
+  border: 1px solid var(--self-line);
+}
+.emoji-cell.active { border-color: var(--self-teal); background: var(--self-teal-deep); }
+.swatch-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.swatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  padding: 0;
+  border: 2px solid transparent;
+  box-shadow: 0 0 0 1px var(--self-line) inset;
+  cursor: pointer;
+}
+.swatch.active { border-color: var(--self-text); }
