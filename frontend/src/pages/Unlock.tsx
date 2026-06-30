@@ -41,7 +41,7 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
         return;
       }
       if (password !== confirm) {
-        setError("Die Passwoerter stimmen nicht ueberein.");
+        setError("Die Passwörter stimmen nicht überein.");
         return;
       }
     }
@@ -114,8 +114,8 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
 
         {mode === "register" && (
           <p className="hint">
-            Das Master-Passwort verlaesst dein Geraet nie und kann nicht zurueckgesetzt werden.
-            Vergisst du es, sind die Codes unwiederbringlich verschluesselt.
+            Das Master-Passwort verlässt dein Gerät nie und kann nicht zurückgesetzt werden.
+            Vergisst du es, sind die Codes unwiederbringlich verschlüsselt.
           </p>
         )}
 

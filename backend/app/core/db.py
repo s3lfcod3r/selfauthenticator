@@ -1,4 +1,4 @@
-"""SQLite-Anbindung via SQLModel. Speichert ausschliesslich Ciphertext."""
+"""SQLite-Anbindung via SQLModel. Speichert ausschließlich Ciphertext."""
 from __future__ import annotations
 
 import os

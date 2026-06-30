@@ -55,7 +55,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
   const [sortMode, setSortMode] = useState<SortMode>(loadSortMode);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
-  // Immer aktuelle Eintraege fuer Pointer-Handler (laufen ausserhalb des Renders).
+  // Immer aktuelle Einträge für Pointer-Handler (laufen außerhalb des Renders).
   const entriesRef = useRef(entries);
   useEffect(() => {
     entriesRef.current = entries;
@@ -64,7 +64,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
   const cardRefs = useRef<Map<string, HTMLElement>>(new Map());
   const startOrders = useRef<Map<string, number | undefined>>(new Map());
 
-  // Ein zentraler 1s-Tick fuer alle Karten (statt Timer pro Karte).
+  // Ein zentraler 1s-Tick für alle Karten (statt Timer pro Karte).
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(id);
@@ -78,7 +78,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
   // Native Android-App ruft nach einem QR-Scan window.__selfauthOnScan(uri).
   // Nur registrieren, wenn wirklich ein nativer Host (SelfAuthNative) vorhanden
   // ist — im reinen Browser bleibt der globale Callback sonst eine Injection-
-  // Flaeche, ueber die fremdes Script ungefragt Konten anlegen koennte.
+  // Fläche, über die fremdes Script ungefragt Konten anlegen könnte.
   useEffect(() => {
     const w = window as unknown as {
       __selfauthOnScan?: (uri: string) => void;
@@ -90,11 +90,11 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       try {
         data = parseOtpauthUri(uri);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "QR ungueltig");
+        setError(e instanceof Error ? e.message : "QR ungültig");
         return;
       }
       handleAdd(data).catch((e) =>
-        setError(e instanceof Error ? e.message : "Hinzufuegen fehlgeschlagen"),
+        setError(e instanceof Error ? e.message : "Hinzufügen fehlgeschlagen"),
       );
     };
     return () => {
@@ -125,7 +125,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       setEntries((prev) => [...prev, entry]);
       setAdding(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Hinzufuegen fehlgeschlagen");
+      setError(e instanceof Error ? e.message : "Hinzufügen fehlgeschlagen");
     }
   }
 
@@ -138,7 +138,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       await deleteEntry(id);
       setEntries((prev) => prev.filter((e) => e.id !== id));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Loeschen fehlgeschlagen");
+      setError(e instanceof Error ? e.message : "Löschen fehlgeschlagen");
     }
   }
 
@@ -171,7 +171,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
 
   async function handleToggleFavorite(entry: DecryptedEntry) {
     const fav = !entry.data.favorite;
-    // Optimistisch umschalten, dann serverseitig bestaetigen.
+    // Optimistisch umschalten, dann serverseitig bestätigen.
     setEntries((prev) =>
       prev.map((p) => (p.id === entry.id ? { ...p, data: { ...p.data, favorite: fav } } : p)),
     );
@@ -305,7 +305,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       {visible.length === 0 ? (
         <div className="empty">
           {entries.length === 0
-            ? "Noch keine Konten. Tippe auf +, um dein erstes 2FA-Konto hinzuzufuegen."
+            ? "Noch keine Konten. Tippe auf +, um dein erstes 2FA-Konto hinzuzufügen."
             : "Keine Treffer."}
         </div>
       ) : (
@@ -331,7 +331,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
         ))
       )}
 
-      <button className="fab" onClick={() => setAdding(true)} aria-label="Konto hinzufuegen">
+      <button className="fab" onClick={() => setAdding(true)} aria-label="Konto hinzufügen">
         +
       </button>
 

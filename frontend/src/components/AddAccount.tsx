@@ -25,14 +25,14 @@ export function AddAccount({ onAdd, onClose }: Props) {
     try {
       onAdd(parseOtpauthUri(uri));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Ungueltige otpauth-URI");
+      setError(e instanceof Error ? e.message : "Ungültige otpauth-URI");
     }
   }
 
   function submitManual() {
     setError(null);
     if (!issuer.trim()) return setError("Anbieter/Name ist erforderlich.");
-    if (!validSecret(secret)) return setError("Secret ist kein gueltiger Base32-Schluessel.");
+    if (!validSecret(secret)) return setError("Secret ist kein gültiger Base32-Schlüssel.");
     onAdd({
       issuer: issuer.trim(),
       label: label.trim(),
@@ -46,7 +46,7 @@ export function AddAccount({ onAdd, onClose }: Props) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>Konto hinzufuegen</h2>
+        <h2>Konto hinzufügen</h2>
         <div className="tabs">
           <button className={tab === "manual" ? "active" : ""} onClick={() => setTab("manual")}>
             Manuell
@@ -77,7 +77,7 @@ export function AddAccount({ onAdd, onClose }: Props) {
             </div>
             <div className="modal-actions">
               <button className="ghost" onClick={onClose}>Abbrechen</button>
-              <button className="primary" onClick={submitManual}>Hinzufuegen</button>
+              <button className="primary" onClick={submitManual}>Hinzufügen</button>
             </div>
           </>
         )}
@@ -88,10 +88,10 @@ export function AddAccount({ onAdd, onClose }: Props) {
               <label>otpauth:// URI</label>
               <input value={uri} onChange={(e) => setUri(e.target.value)} placeholder="otpauth://totp/…" />
             </div>
-            <p className="hint">Aus „Schluessel manuell exportieren" der jeweiligen App, oder QR-Inhalt einfuegen.</p>
+            <p className="hint">Aus „Schlüssel manuell exportieren" der jeweiligen App, oder QR-Inhalt einfügen.</p>
             <div className="modal-actions">
               <button className="ghost" onClick={onClose}>Abbrechen</button>
-              <button className="primary" onClick={submitUri}>Hinzufuegen</button>
+              <button className="primary" onClick={submitUri}>Hinzufügen</button>
             </div>
           </>
         )}
@@ -106,7 +106,7 @@ export function AddAccount({ onAdd, onClose }: Props) {
               </div>
             </>
           ) : (
-            <QrScan onText={(t) => { setUri(t); try { onAdd(parseOtpauthUri(t)); } catch (e) { setError(e instanceof Error ? e.message : "QR ungueltig"); setTab("uri"); } }} onError={(m) => { setError(m); setTab("uri"); }} onClose={onClose} />
+            <QrScan onText={(t) => { setUri(t); try { onAdd(parseOtpauthUri(t)); } catch (e) { setError(e instanceof Error ? e.message : "QR ungültig"); setTab("uri"); } }} onError={(m) => { setError(m); setTab("uri"); }} onClose={onClose} />
           ))}
       </div>
     </div>
@@ -131,7 +131,7 @@ function QrScan({ onText, onError, onClose }: { onText: (t: string) => void; onE
         });
         stop = () => controls.stop();
       } catch {
-        onError("Kamera nicht verfuegbar — bitte URI manuell einfuegen.");
+        onError("Kamera nicht verfügbar — bitte URI manuell einfügen.");
       }
     })();
     return () => {

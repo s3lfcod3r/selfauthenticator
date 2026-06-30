@@ -1,5 +1,5 @@
 // TOTP-Berechnung im Client (RFC 6238) via otpauth. Codes brauchen nur Zeit+Seed
-// -> funktionieren vollstaendig offline.
+// -> funktionieren vollständig offline.
 import { Secret, TOTP, URI } from "otpauth";
 
 export interface TotpData {
@@ -10,7 +10,7 @@ export interface TotpData {
   digits: number;
   period: number;
   // --- Optionale Darstellungs-/Sortier-Metadaten ---
-  // Werden im verschluesselten Eintrag mitgespeichert (Zero-Knowledge bleibt
+  // Werden im verschlüsselten Eintrag mitgespeichert (Zero-Knowledge bleibt
   // erhalten) und von der Code-Berechnung ignoriert.
   color?: string; // Akzentfarbe als 6-stelliger Hex (#33a78c)
   icon?: string; // Emoji als Symbol
@@ -24,7 +24,7 @@ export function normalizeSecret(raw: string): string {
 
 export function parseOtpauthUri(uri: string): TotpData {
   const o = URI.parse(uri.trim());
-  if (!(o instanceof TOTP)) throw new Error("Nur TOTP wird unterstuetzt (kein HOTP).");
+  if (!(o instanceof TOTP)) throw new Error("Nur TOTP wird unterstützt (kein HOTP).");
   return {
     issuer: o.issuer ?? "",
     label: o.label ?? "",

@@ -1,8 +1,8 @@
-"""Vault-Sync: speichert/liest verschluesselte TOTP-Eintraege.
+"""Vault-Sync: speichert/liest verschlüsselte TOTP-Einträge.
 
 Der Server behandelt jeden Eintrag als Blackbox-Ciphertext. Konflikte werden per
-Optimistic Concurrency (revision) erkannt. Loeschungen werden als Tombstone
-(deleted=True, leerer Ciphertext) gehalten, damit andere Geraete sie mitbekommen.
+Optimistic Concurrency (revision) erkannt. Löschungen werden als Tombstone
+(deleted=True, leerer Ciphertext) gehalten, damit andere Geräte sie mitbekommen.
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from ..models import VaultEntry
 
 router = APIRouter(prefix="/api/vault", tags=["vault"])
 
-# Obergrenze an Eintraegen je Nutzer (gegen DB-Flutung mit gestohlenem Token).
+# Obergrenze an Einträgen je Nutzer (gegen DB-Flutung mit gestohlenem Token).
 _MAX_ENTRIES_PER_USER = 1000
 
 
@@ -93,11 +93,11 @@ def upsert_entry(
         session.refresh(entry)
         return EntryOut(**entry.model_dump())
 
-    # Geloeschte Eintraege nicht stillschweigend wiederbeleben.
+    # Gelöschte Einträge nicht stillschweigend wiederbeleben.
     if existing.deleted:
         raise HTTPException(
             status.HTTP_409_CONFLICT,
-            "Eintrag wurde geloescht (Tombstone) — Neuanlage mit neuer ID erforderlich",
+            "Eintrag wurde gelöscht (Tombstone) — Neuanlage mit neuer ID erforderlich",
         )
 
     # Update: Konflikt, wenn der Client von einer veralteten Revision ausgeht.
@@ -129,7 +129,7 @@ def delete_entry(
     if entry is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Eintrag nicht gefunden")
 
-    # Tombstone: Ciphertext verwerfen, Revision erhoehen.
+    # Tombstone: Ciphertext verwerfen, Revision erhöhen.
     entry.deleted = True
     entry.ciphertext = ""
     entry.revision += 1

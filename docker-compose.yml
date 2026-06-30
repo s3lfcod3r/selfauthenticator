@@ -7,9 +7,9 @@ services:
     environment:
       # PFLICHT: 64-stelliges Hex-Secret. Erzeugen mit:
       #   python -c "import secrets; print(secrets.token_hex(32))"
-      # Compose bricht ab, wenn die Variable fehlt (statt leeres Secret zu uebergeben).
+      # Compose bricht ab, wenn die Variable fehlt (statt leeres Secret zu übergeben).
       SELFAUTH_SECRET: ${SELFAUTH_SECRET:?SELFAUTH_SECRET muss gesetzt sein - erzeugen mit: python -c "import secrets; print(secrets.token_hex(32))"}
-      # Nach Anlegen deines Accounts auf false setzen, um die Registrierung zu schliessen.
+      # Nach Anlegen deines Accounts auf false setzen, um die Registrierung zu schließen.
       SELFAUTH_ALLOW_REGISTRATION: ${SELFAUTH_ALLOW_REGISTRATION:-true}
       TZ: ${TZ:-Europe/Berlin}
     volumes:

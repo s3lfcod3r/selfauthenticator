@@ -1,8 +1,8 @@
 // Zero-Knowledge-Krypto im Client. Der Server sieht nur die base64-Blobs hier.
 //   MasterKey  = Argon2id(master_pw, kdf_salt)
 //   AuthHash   = BLAKE2b(MasterKey || master_pw)   -> nur dieser geht zum Server
-//   VaultKey   = 32 zufaellige Bytes, mit MasterKey gewrappt (protected_vault_key)
-//   Eintraege  = XChaCha20-Poly1305(JSON, key=VaultKey), nonce vorangestellt
+//   VaultKey   = 32 zufällige Bytes, mit MasterKey gewrappt (protected_vault_key)
+//   Einträge  = XChaCha20-Poly1305(JSON, key=VaultKey), nonce vorangestellt
 import { getSodium } from "./sodium";
 
 const B64 = 1; // sodium.base64_variants.ORIGINAL (Standard-Base64 mit Padding)

@@ -22,7 +22,7 @@ export function App() {
       setSession(s);
       setEntries(loaded);
       setPhase("unlocked");
-      // Vault-Key fuer kuenftigen Biometrie-Unlock in der nativen App sichern.
+      // Vault-Key für künftigen Biometrie-Unlock in der nativen App sichern.
       try {
         nativeSaveVaultKey(await keyToB64(s.vaultKey));
       } catch {

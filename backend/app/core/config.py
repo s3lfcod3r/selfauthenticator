@@ -1,8 +1,8 @@
 """Zentrale Konfiguration aus Environment-Variablen (Prefix SELFAUTH_).
 
 WICHTIG (Zero-Knowledge): SELFAUTH_SECRET signiert NUR JWTs und leitet den
-Pseudo-Salt fuer die Account-Enumeration-Abwehr ab. Es ver-/entschluesselt
-NIEMALS Vault-Daten — das passiert ausschliesslich im Client (Browser/APK).
+Pseudo-Salt für die Account-Enumeration-Abwehr ab. Es ver-/entschlüsselt
+NIEMALS Vault-Daten — das passiert ausschließlich im Client (Browser/APK).
 Der Server sieht TOTP-Seeds zu keinem Zeitpunkt im Klartext.
 """
 from __future__ import annotations
@@ -20,14 +20,14 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="SELFAUTH_", extra="ignore")
 
     app_name: str = "SelfAuthenticator"
-    # Master-Secret: PFLICHT. Ohne gueltiges SELFAUTH_SECRET startet die App nicht
-    # (ein bekannter Default-Key wuerde JWTs faelschbar machen).
+    # Master-Secret: PFLICHT. Ohne gültiges SELFAUTH_SECRET startet die App nicht
+    # (ein bekannter Default-Key würde JWTs fälschbar machen).
     secret: str = ""
     db_path: str = "./data/selfauthenticator.db"
     base_url: str = ""
 
-    # Selbst-Registrierung. Fuer Single-/Family-Use offen lassen, danach
-    # SELFAUTH_ALLOW_REGISTRATION=false setzen, um den Server zu schliessen.
+    # Selbst-Registrierung. Für Single-/Family-Use offen lassen, danach
+    # SELFAUTH_ALLOW_REGISTRATION=false setzen, um den Server zu schließen.
     allow_registration: bool = True
 
     # JWT

@@ -1,4 +1,4 @@
-// Vault-Service: verbindet Auth + Krypto + Sync. Haelt KEINEN globalen State —
+// Vault-Service: verbindet Auth + Krypto + Sync. Hält KEINEN globalen State —
 // der VaultKey lebt nur im React-State (Speicher), nie in localStorage.
 import { api, setToken } from "./api";
 import { decryptJson, deriveAuthHash, deriveMasterKey, encryptJson, generateSalt, generateVaultKey, unwrapKey, wrapKey } from "./crypto";
@@ -34,7 +34,7 @@ export async function unlock(email: string, password: string): Promise<Session> 
     const vaultKey = await unwrapKey(res.protected_vault_key, masterKey);
     return { email, vaultKey };
   } finally {
-    // MasterKey aus dem Speicher raeumen, sobald VaultKey ausgepackt ist.
+    // MasterKey aus dem Speicher räumen, sobald VaultKey ausgepackt ist.
     masterKey.fill(0);
   }
 }
@@ -71,12 +71,12 @@ export async function loadEntries(vaultKey: Uint8Array): Promise<DecryptedEntry[
       const data = await decryptJson<TotpData>(e.ciphertext, vaultKey);
       out.push({ id: e.id, revision: e.revision, data });
     } catch {
-      // Eintrag mit falschem/anderem Key -> ueberspringen statt App zu crashen.
+      // Eintrag mit falschem/anderem Key -> überspringen statt App zu crashen.
       failed += 1;
     }
   }
   if (failed > 0) {
-    console.warn(`[SelfAuth] ${failed} Eintrag/Eintraege konnten nicht entschluesselt werden.`);
+    console.warn(`[SelfAuth] ${failed} Eintrag/Einträge konnten nicht entschlüsselt werden.`);
   }
   out.sort((a, b) =>
     (a.data.issuer || a.data.label).localeCompare(b.data.issuer || b.data.label, "de"),

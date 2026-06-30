@@ -8,7 +8,7 @@ interface Props {
   onClose: () => void;
 }
 
-// Marken-nahe Akzentfarben (aus tokens.css) + zwei neutrale Ergaenzungen.
+// Marken-nahe Akzentfarben (aus tokens.css) + zwei neutrale Ergänzungen.
 const COLORS = [
   "#33a78c", // teal (Standard)
   "#9dbdd0", // ice
@@ -20,7 +20,7 @@ const COLORS = [
   "#8a9caa", // grau
 ];
 
-// Kleine, praxisnahe Emoji-Auswahl fuer 2FA-Konten.
+// Kleine, praxisnahe Emoji-Auswahl für 2FA-Konten.
 const EMOJIS = [
   "🔐", "🛡️", "🔑", "🌐", "📧", "🐙", "☁️", "💳",
   "🏦", "🎮", "💬", "📱", "🛒", "💼", "🎬", "⭐",

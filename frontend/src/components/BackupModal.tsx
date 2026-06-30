@@ -60,7 +60,7 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
 
   async function doImport() {
     setError(null);
-    if (!fileText) return setError("Bitte zuerst eine Backup-Datei waehlen.");
+    if (!fileText) return setError("Bitte zuerst eine Backup-Datei wählen.");
     if (!pw) return setError("Backup-Passwort eingeben.");
     setBusy(true);
     try {
@@ -92,7 +92,7 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
         {tab === "export" ? (
           <>
             <p className="hint">
-              Verschluesselt alle {entries.length} Konten in eine Datei. Mit dem Passwort
+              Verschlüsselt alle {entries.length} Konten in eine Datei. Mit dem Passwort
               kannst du sie jederzeit (auch in der App) wiederherstellen.
             </p>
             <div className="field">
@@ -106,7 +106,7 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
               />
             </div>
             <div className="modal-actions">
-              <button className="ghost" onClick={onClose}>Schliessen</button>
+              <button className="ghost" onClick={onClose}>Schließen</button>
               <button className="primary" onClick={doExport} disabled={busy}>
                 {busy ? "…" : "Herunterladen"}
               </button>
@@ -114,10 +114,10 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
           </>
         ) : (
           <>
-            <p className="hint">Backup-Datei waehlen und Backup-Passwort eingeben — Konten werden hinzugefuegt.</p>
+            <p className="hint">Backup-Datei wählen und Backup-Passwort eingeben — Konten werden hinzugefügt.</p>
             <div className="field">
               <button className="ghost" onClick={() => fileRef.current?.click()}>
-                {fileName || "Datei waehlen…"}
+                {fileName || "Datei wählen…"}
               </button>
               <input
                 ref={fileRef}
@@ -132,7 +132,7 @@ export function BackupModal({ entries, onImport, onClose }: Props) {
               <input type="password" autoComplete="off" value={pw} onChange={(e) => setPw(e.target.value)} />
             </div>
             <div className="modal-actions">
-              <button className="ghost" onClick={onClose}>Schliessen</button>
+              <button className="ghost" onClick={onClose}>Schließen</button>
               <button className="primary" onClick={doImport} disabled={busy}>
                 {busy ? "…" : "Importieren"}
               </button>

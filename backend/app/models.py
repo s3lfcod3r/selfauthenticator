@@ -1,4 +1,4 @@
-"""Datenmodelle. Der Server kennt nur oeffentliche KDF-Parameter und
+"""Datenmodelle. Der Server kennt nur öffentliche KDF-Parameter und
 Ciphertext-Blobs — niemals Master-Passwort, VaultKey oder TOTP-Seeds.
 """
 from __future__ import annotations
@@ -16,7 +16,7 @@ class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     email: str = Field(index=True, unique=True)
 
-    # Oeffentliche KDF-Parameter: der Client leitet daraus MasterKey =
+    # Öffentliche KDF-Parameter: der Client leitet daraus MasterKey =
     # Argon2id(master_password, kdf_salt) ab. Salt ist nicht geheim.
     kdf_salt: str  # base64
     kdf_algorithm: str = "argon2id"
@@ -24,12 +24,12 @@ class User(SQLModel, table=True):
     kdf_ops: int = 3
 
     # Server-seitiger langsamer Hash des client-seitigen AuthHash. Der AuthHash
-    # selbst ist eine vom MasterKey abgeleitete Groesse — das Master-Passwort
-    # verlaesst das Geraet nie.
+    # selbst ist eine vom MasterKey abgeleitete Größe — das Master-Passwort
+    # verlässt das Gerät nie.
     auth_hash: str
 
     # XChaCha20-Poly1305(VaultKey, key=MasterKey), nonce vorangestellt, base64.
-    # Nur mit dem MasterKey des Nutzers entschluesselbar → fuer den Server Muell.
+    # Nur mit dem MasterKey des Nutzers entschlüsselbar → für den Server Muell.
     protected_vault_key: str
 
     created_at: datetime = Field(default_factory=_utcnow)
@@ -46,14 +46,14 @@ class VaultEntry(SQLModel, table=True):
 
     # Monoton steigende Revision je Eintrag → Optimistic Concurrency beim Sync.
     revision: int = 1
-    # Tombstone: geloeschte Eintraege bleiben als Marker erhalten, damit andere
-    # Geraete die Loeschung mitbekommen.
+    # Tombstone: gelöschte Einträge bleiben als Marker erhalten, damit andere
+    # Geräte die Löschung mitbekommen.
     deleted: bool = False
     updated_at: datetime = Field(default_factory=_utcnow)
 
 
 class RevokedToken(SQLModel, table=True):
-    """Blocklist widerrufener JWTs (Logout). Eintraege koennen nach Ablauf
+    """Blocklist widerrufener JWTs (Logout). Einträge können nach Ablauf
     (expires_at) gefahrlos entfernt werden."""
 
     jti: str = Field(primary_key=True)

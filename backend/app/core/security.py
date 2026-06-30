@@ -1,4 +1,4 @@
-"""JWT-Ausstellung/-Pruefung + serverseitiges Hashing des Client-AuthHash.
+"""JWT-Ausstellung/-Prüfung + serverseitiges Hashing des Client-AuthHash.
 
 Zero-Knowledge-Login: Der Client leitet aus dem Master-Passwort einen AuthHash
 ab und schickt NUR diesen. Wir legen davon einen langsamen Argon2-Hash ab. Selbst
@@ -24,7 +24,7 @@ from .db import get_session
 
 _ph = PasswordHasher()
 _bearer = HTTPBearer(auto_error=True)
-# Oeffentlicher Alias fuer Router, die das Bearer-Token direkt brauchen (z. B. /logout).
+# Öffentlicher Alias für Router, die das Bearer-Token direkt brauchen (z. B. /logout).
 bearer_scheme = _bearer
 
 # JWT-Decode akzeptiert NUR diese (symmetrischen) Algorithmen — hart verdrahtet,
@@ -33,15 +33,15 @@ _ALLOWED_DECODE_ALGS = ["HS256", "HS384", "HS512"]
 
 # Konstanter Dummy-Hash. Bei unbekannter E-Mail verifizieren wir dagegen, damit
 # die Antwortzeit dieselbe ist wie bei existierenden Accounts (kein Timing-Orakel,
-# das "Konto existiert nicht" verraten wuerde).
+# das "Konto existiert nicht" verraten würde).
 _DUMMY_HASH = _ph.hash("anti-timing-dummy-constant")
 
 
 def _derive_subkey(purpose: str) -> bytes:
-    """Zweckgebundener Teilschluessel aus dem Master-Secret (Key-Separation).
+    """Zweckgebundener Teilschlüssel aus dem Master-Secret (Key-Separation).
 
-    So fuehrt das Bekanntwerden eines abgeleiteten Schluessels (z. B. fuer den
-    Pseudo-Salt) nicht direkt zum JWT-Signaturschluessel.
+    So führt das Bekanntwerden eines abgeleiteten Schlüssels (z. B. für den
+    Pseudo-Salt) nicht direkt zum JWT-Signaturschlüssel.
     """
     secret = get_settings().secret.encode("utf-8")
     return hmac.new(secret, purpose.encode("utf-8"), hashlib.sha256).digest()
@@ -53,8 +53,8 @@ def hash_auth(client_auth_hash: str) -> str:
 
 
 def verify_auth(stored: str | None, client_auth_hash: str) -> bool:
-    """Verifiziert den AuthHash. Laeuft auch bei unbekanntem Account (stored=None)
-    die volle Argon2-Pruefung gegen einen Dummy-Hash, um Timing-Leaks zu vermeiden.
+    """Verifiziert den AuthHash. Läuft auch bei unbekanntem Account (stored=None)
+    die volle Argon2-Prüfung gegen einen Dummy-Hash, um Timing-Leaks zu vermeiden.
     """
     target = stored if stored is not None else _DUMMY_HASH
     try:
@@ -67,12 +67,12 @@ def verify_auth(stored: str | None, client_auth_hash: str) -> bool:
 
 
 def pseudo_salt(email: str) -> str:
-    """Deterministischer Fake-Salt fuer unbekannte E-Mails (Anti-Enumeration).
+    """Deterministischer Fake-Salt für unbekannte E-Mails (Anti-Enumeration).
 
-    Liefert fuer nicht existierende Accounts einen stabilen, aber gefaelschten
-    Salt, damit /prelogin nicht verraet, ob ein Account existiert. Schluessel ist
-    ein zweckgebundener Teilschluessel (NICHT der JWT-Signaturschluessel selbst).
-    Laenge entspricht echten Salts (16 Byte -> 24 base64-Zeichen).
+    Liefert für nicht existierende Accounts einen stabilen, aber gefälschten
+    Salt, damit /prelogin nicht verrät, ob ein Account existiert. Schlüssel ist
+    ein zweckgebundener Teilschlüssel (NICHT der JWT-Signaturschlüssel selbst).
+    Länge entspricht echten Salts (16 Byte -> 24 base64-Zeichen).
     """
     digest = hmac.new(
         _derive_subkey("prelogin-pseudo-salt"),
@@ -97,7 +97,7 @@ def create_access_token(user_id: int) -> str:
 
 def decode_token(token: str) -> dict:
     """Dekodiert + validiert ein JWT (Signatur, Algorithmus, Ablauf). Wirft bei
-    ungueltig. Prueft NICHT die Blocklist — dafuer get_current_user_id."""
+    ungültig. Prüft NICHT die Blocklist — dafür get_current_user_id."""
     s = get_settings()
     return jwt.decode(token, s.secret, algorithms=_ALLOWED_DECODE_ALGS)
 
@@ -121,7 +121,7 @@ def get_current_user_id(
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Ungueltiges oder abgelaufenes Token",
+            detail="Ungültiges oder abgelaufenes Token",
         ) from exc
 
 
