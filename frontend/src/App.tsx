@@ -15,6 +15,9 @@ export function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [entries, setEntries] = useState<DecryptedEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  // Anzahl beim letzten Laden nicht entschlüsselbarer Einträge -> im Tresor als
+  // Hinweis anzeigen, damit fehlende Einträge nicht wie Datenverlust wirken.
+  const [failedCount, setFailedCount] = useState(0);
 
   const onUnlocked = useCallback(async (s: Session) => {
     setPhase("unlocking");
@@ -22,7 +25,8 @@ export function App() {
     try {
       const loaded = await loadEntries(s.vaultKey);
       setSession(s);
-      setEntries(loaded);
+      setEntries(loaded.entries);
+      setFailedCount(loaded.failed);
       setPhase("unlocked");
       // Vault-Key für künftigen Biometrie-Unlock in der nativen App sichern.
       try {
@@ -58,7 +62,8 @@ export function App() {
         const loaded = await loadEntries(vaultKey);
         if (cancelled) return;
         setSession({ email: "", vaultKey });
-        setEntries(loaded);
+        setEntries(loaded.entries);
+        setFailedCount(loaded.failed);
         setPhase("unlocked");
       } catch {
         if (cancelled) return;
@@ -72,7 +77,15 @@ export function App() {
   }, []);
 
   if (phase === "unlocked" && session) {
-    return <VaultView session={session} entries={entries} setEntries={setEntries} onLock={lock} />;
+    return (
+      <VaultView
+        session={session}
+        entries={entries}
+        setEntries={setEntries}
+        onLock={lock}
+        failedCount={failedCount}
+      />
+    );
   }
 
   return <Unlock onUnlocked={onUnlocked} busy={phase === "unlocking"} externalError={error} />;
