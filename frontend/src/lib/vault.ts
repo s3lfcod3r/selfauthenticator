@@ -2,7 +2,7 @@
 // der VaultKey lebt nur im React-State (Speicher), nie in localStorage.
 import { api, setToken } from "./api";
 import { decryptJson, deriveAuthHash, deriveMasterKey, encryptJson, generateSalt, generateVaultKey, unwrapKey, wrapKey } from "./crypto";
-import type { TotpData } from "./totp";
+import { setClockOffsetFromServerTime, type TotpData } from "./totp";
 
 const DEFAULT_MEM_KIB = 65536;
 const DEFAULT_OPS = 3;
@@ -61,8 +61,17 @@ export async function register(email: string, password: string): Promise<Session
   }
 }
 
-export async function loadEntries(vaultKey: Uint8Array): Promise<DecryptedEntry[]> {
-  const { entries } = await api.listVault();
+export interface LoadResult {
+  entries: DecryptedEntry[];
+  // Anzahl der Einträge, die nicht entschlüsselt werden konnten (z.B. falscher
+  // Key). Der Aufrufer zeigt das im UI an, damit es nicht wie Datenverlust wirkt.
+  failed: number;
+}
+
+export async function loadEntries(vaultKey: Uint8Array): Promise<LoadResult> {
+  const { entries, server_time } = await api.listVault();
+  // Uhr gegen den Server ausrichten, bevor Codes berechnet werden.
+  if (server_time) setClockOffsetFromServerTime(server_time);
   const out: DecryptedEntry[] = [];
   let failed = 0;
   for (const e of entries) {
@@ -81,7 +90,7 @@ export async function loadEntries(vaultKey: Uint8Array): Promise<DecryptedEntry[
   out.sort((a, b) =>
     (a.data.issuer || a.data.label).localeCompare(b.data.issuer || b.data.label, "de"),
   );
-  return out;
+  return { entries: out, failed };
 }
 
 export async function addEntry(vaultKey: Uint8Array, data: TotpData): Promise<DecryptedEntry> {

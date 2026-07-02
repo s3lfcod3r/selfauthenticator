@@ -3,8 +3,9 @@ import { TokenCard } from "../components/TokenCard";
 import { AddAccount } from "../components/AddAccount";
 import { EditAccount } from "../components/EditAccount";
 import { BackupModal } from "../components/BackupModal";
-import { addEntry, deleteEntry, updateEntry, type DecryptedEntry, type Session } from "../lib/vault";
+import { addEntry, deleteEntry, loadEntries, updateEntry, type DecryptedEntry, type Session } from "../lib/vault";
 import { parseOtpauthUri, type TotpData } from "../lib/totp";
+import { ApiError } from "../lib/api";
 import { useLang, LangPicker } from "../lib/i18n";
 
 interface Props {
@@ -12,6 +13,8 @@ interface Props {
   entries: DecryptedEntry[];
   setEntries: React.Dispatch<React.SetStateAction<DecryptedEntry[]>>;
   onLock: () => void;
+  // Anzahl beim Laden nicht entschlüsselbarer Einträge (aus App).
+  failedCount?: number;
 }
 
 type SortMode = "manual" | "az" | "za";
@@ -46,7 +49,7 @@ function sortEntries(list: DecryptedEntry[], mode: SortMode): DecryptedEntry[] {
   });
 }
 
-export function VaultView({ session, entries, setEntries, onLock }: Props) {
+export function VaultView({ session, entries, setEntries, onLock, failedCount = 0 }: Props) {
   const { t } = useLang();
   const [tick, setTick] = useState(0);
   const [query, setQuery] = useState("");
@@ -54,6 +57,7 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
   const [editing, setEditing] = useState<DecryptedEntry | null>(null);
   const [backup, setBackup] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>(loadSortMode);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
@@ -71,6 +75,32 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
     const id = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(id);
   }, []);
+
+  // Hinweis auf nicht entschlüsselbare Einträge (aus dem letzten Laden).
+  useEffect(() => {
+    if (failedCount > 0) {
+      setNotice(
+        t("{n} Einträge konnten nicht entschlüsselt werden.").replace("{n}", String(failedCount)),
+      );
+    }
+  }, [failedCount]);
+
+  // Tresor komplett neu vom Server laden und lokalen State ersetzen. Wird bei
+  // Konflikten (409) genutzt, damit lokaler Stand und Server nicht dauerhaft
+  // auseinanderlaufen.
+  async function reloadEntries(): Promise<void> {
+    try {
+      const res = await loadEntries(session.vaultKey);
+      setEntries(res.entries);
+      if (res.failed > 0) {
+        setNotice(
+          t("{n} Einträge konnten nicht entschlüsselt werden.").replace("{n}", String(res.failed)),
+        );
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t("Tresor konnte nicht neu geladen werden"));
+    }
+  }
 
   function changeSort(mode: SortMode) {
     setSortMode(mode);
@@ -95,9 +125,13 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
         setError(e instanceof Error ? e.message : t("QR ungültig"));
         return;
       }
-      handleAdd(data).catch((e) =>
-        setError(e instanceof Error ? e.message : t("Hinzufügen fehlgeschlagen")),
-      );
+      // entriesRef statt Closure -> immer aktueller Stand für die order-Berechnung.
+      const current = entriesRef.current;
+      const order = current.reduce((m, e) => Math.max(m, e.data.order ?? -1), -1) + 1;
+      setError(null);
+      addEntry(session.vaultKey, { ...data, order })
+        .then((entry) => setEntries((prev) => [...prev, entry]))
+        .catch((e) => setError(e instanceof Error ? e.message : t("Hinzufügen fehlgeschlagen")));
     };
     return () => {
       delete w.__selfauthOnScan;
@@ -146,16 +180,32 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
 
   async function handleImport(list: TotpData[]) {
     setError(null);
-    try {
-      let order = nextOrder();
-      const added: DecryptedEntry[] = [];
-      for (const data of list) {
-        added.push(await addEntry(session.vaultKey, { ...data, order: order++ }));
+    let order = nextOrder();
+    let ok = 0;
+    let lastError: unknown = null;
+    // Jeden erfolgreich importierten Eintrag sofort in die UI übernehmen, damit
+    // ein Fehler mitten in der Schleife die bereits importierten nicht verwirft.
+    for (const data of list) {
+      try {
+        const entry = await addEntry(session.vaultKey, { ...data, order: order++ });
+        setEntries((prev) => [...prev, entry]);
+        ok += 1;
+      } catch (e) {
+        lastError = e;
       }
-      setEntries((prev) => [...prev, ...added]);
-      setBackup(false);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t("Import fehlgeschlagen"));
+    }
+    setBackup(false);
+    if (ok === list.length) {
+      setNotice(null);
+    } else if (ok > 0) {
+      // Teilerfolg: "X von Y importiert" melden.
+      setError(
+        t("{ok} von {total} importiert.")
+          .replace("{ok}", String(ok))
+          .replace("{total}", String(list.length)),
+      );
+    } else {
+      setError(lastError instanceof Error ? lastError.message : t("Import fehlgeschlagen"));
     }
   }
 
@@ -181,11 +231,10 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       const updated = await updateEntry(session.vaultKey, entry, { favorite: fav });
       setEntries((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
     } catch (e) {
-      // Rollback bei Fehler.
-      setEntries((prev) =>
-        prev.map((p) => (p.id === entry.id ? { ...p, data: { ...p.data, favorite: !fav } } : p)),
-      );
+      // Betroffenen Eintrag frisch vom Server holen statt einen möglicherweise
+      // veralteten Wert zurückzuschreiben (vermeidet Divergenz bei 409).
       setError(e instanceof Error ? e.message : t("Anheften fehlgeschlagen"));
+      await reloadEntries();
     }
   }
 
@@ -240,6 +289,12 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
           setEntries((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
         } catch (err) {
           setError(err instanceof Error ? err.message : t("Reihenfolge speichern fehlgeschlagen"));
+          // Bei Versionskonflikt (409) driftet der lokale Stand dauerhaft ab ->
+          // frisch vom Server laden und Rest der Schleife abbrechen.
+          if (err instanceof ApiError && err.status === 409) {
+            await reloadEntries();
+            return;
+          }
         }
       }
     }
@@ -294,6 +349,11 @@ export function VaultView({ session, entries, setEntries, onLock }: Props) {
       )}
 
       {error && <div className="auth-error">{error}</div>}
+      {notice && (
+        <div className="auth-error" role="status" onClick={() => setNotice(null)}>
+          {notice}
+        </div>
+      )}
 
       {visible.length === 0 ? (
         <div className="empty">

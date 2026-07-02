@@ -32,7 +32,9 @@ class Settings(BaseSettings):
 
     # JWT
     jwt_algorithm: str = "HS256"
-    jwt_expire_minutes: int = 60 * 24 * 30  # 30 Tage — App soll lange eingeloggt bleiben
+    # Standard: 7 Tage. Über SELFAUTH_JWT_EXPIRE_MINUTES konfigurierbar, wenn die
+    # App länger eingeloggt bleiben soll.
+    jwt_expire_minutes: int = 60 * 24 * 7  # 7 Tage
 
     # CORS (Dev: Vite-Devserver)
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
@@ -51,6 +53,16 @@ class Settings(BaseSettings):
             )
         if self.jwt_algorithm not in _ALLOWED_JWT_ALGS:
             raise ValueError(f"SELFAUTH_JWT_ALGORITHM muss in {_ALLOWED_JWT_ALGS} liegen")
+        # Wildcard-CORS ist mit allow_credentials=True unsicher (und laut Spec
+        # unzulässig): Browser würden Credentials an jede Origin senden. Der
+        # Server läuft mit allow_credentials=True (siehe main.py), daher hier
+        # hart verbieten.
+        if "*" in self.cors_list:
+            raise ValueError(
+                "SELFAUTH_CORS_ORIGINS darf kein '*' enthalten, solange Credentials "
+                "erlaubt sind. Konkrete Origins angeben "
+                "(z.B. https://auth.example.com)."
+            )
         return self
 
 

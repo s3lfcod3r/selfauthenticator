@@ -18,6 +18,22 @@ export interface TotpData {
   order?: number; // manuelle Reihenfolge (kleiner = weiter oben)
 }
 
+// Offset (ms) zwischen Server- und lokaler Uhr. Codes werden gegen die
+// Serverzeit gerechnet, damit eine falsch gestellte Geräteuhr keine ungültigen
+// TOTP-Codes erzeugt. Wird nach jedem Vault-Load aus server_time gesetzt.
+let clockOffsetMs = 0;
+
+export function setClockOffsetFromServerTime(serverTimeIso: string): void {
+  const server = Date.parse(serverTimeIso);
+  if (Number.isNaN(server)) return; // ungültige Angabe -> Offset unverändert lassen
+  clockOffsetMs = server - Date.now();
+}
+
+// Aktuelle, um den Server-Offset korrigierte Zeit in Millisekunden.
+export function correctedNow(): number {
+  return Date.now() + clockOffsetMs;
+}
+
 export function normalizeSecret(raw: string): string {
   return raw.replace(/\s/g, "").toUpperCase();
 }
@@ -54,8 +70,9 @@ export interface CodeState {
 
 export function currentCode(d: TotpData): CodeState {
   const period = d.period || 30;
-  const code = makeTotp(d).generate();
-  const remaining = period - (Math.floor(Date.now() / 1000) % period);
+  const now = correctedNow();
+  const code = makeTotp(d).generate({ timestamp: now });
+  const remaining = period - (Math.floor(now / 1000) % period);
   return { code, remaining, period };
 }
 
