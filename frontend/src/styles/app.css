@@ -181,7 +181,10 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
   font-size: 1.5rem;
   letter-spacing: 0.08em;
   color: var(--self-teal-bright);
+  transition: color 0.5s linear;
 }
+.token-code.warn { color: var(--self-yellow); }
+.token-code.crit { color: var(--self-red); }
 .token-code.copied { color: var(--self-cyan); }
 .token-right { display: flex; align-items: center; gap: 0.6rem; }
 .token-tools { display: flex; flex-direction: column; gap: 0.1rem; }
