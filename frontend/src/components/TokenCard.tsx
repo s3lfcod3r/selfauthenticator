@@ -52,7 +52,8 @@ export function TokenCard({
   }
 
   const offset = CIRC * (1 - remaining / period);
-  const low = remaining <= 5;
+  // Ampel: viel Zeit = teal, mittel = gelb, gleich abgelaufen = rot (+ Puls).
+  const level = remaining <= 5 ? "crit" : remaining <= 10 ? "warn" : "";
 
   // Eigene Farbe faerbt Avatar-Hintergrund (transparent) + Text.
   const avatarStyle = data.color
@@ -86,7 +87,7 @@ export function TokenCard({
         <span className={`token-code${copied ? " copied" : ""}`}>
           {copied ? "kopiert" : formatCode(code)}
         </span>
-        <svg className={`ring${low ? " low" : ""}`} viewBox="0 0 34 34">
+        <svg className={`ring${level ? " " + level : ""}`} viewBox="0 0 34 34">
           <circle className="bg" cx="17" cy="17" r={RADIUS} />
           <circle
             className="fg"
