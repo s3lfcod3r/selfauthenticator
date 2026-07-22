@@ -202,8 +202,14 @@ label { display: block; font-size: 0.78rem; color: var(--self-text-2); margin: 0
 .ring { width: 34px; height: 34px; transform: rotate(-90deg); }
 .ring circle { fill: none; stroke-width: 3; }
 .ring .bg { stroke: var(--self-line-strong); }
-.ring .fg { stroke: var(--self-teal); transition: stroke-dashoffset 1s linear; }
-.ring.low .fg { stroke: var(--self-red); }
+.ring .fg { stroke: var(--self-teal); transition: stroke-dashoffset 1s linear, stroke 0.5s linear; }
+.ring.warn .fg { stroke: var(--self-yellow); }
+.ring.crit .fg { stroke: var(--self-red); }
+.ring.crit { animation: ringPulse 1s ease-in-out infinite; }
+@keyframes ringPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@media (prefers-reduced-motion: reduce) {
+  .ring.crit { animation: none; }
+}
 
 /* ---------- FAB + modal ---------- */
 .fab {
