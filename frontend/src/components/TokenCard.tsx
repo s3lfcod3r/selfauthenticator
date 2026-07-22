@@ -84,7 +84,7 @@ export function TokenCard({
         {data.label && data.issuer && <div className="token-label">{data.label}</div>}
       </div>
       <div className="token-right">
-        <span className={`token-code${copied ? " copied" : ""}`}>
+        <span className={`token-code${level ? " " + level : ""}${copied ? " copied" : ""}`}>
           {copied ? "kopiert" : formatCode(code)}
         </span>
         <svg className={`ring${level ? " " + level : ""}`} viewBox="0 0 34 34">
