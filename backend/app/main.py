@@ -42,7 +42,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        response.headers["Permissions-Policy"] = "camera=(self), microphone=(self), geolocation=(self)"
         response.headers["Content-Security-Policy"] = _CSP
         # Hinweis: HSTS bewusst NICHT hier — die App wird im LAN auch über http
         # genutzt; HSTS muss der TLS-terminierende Reverse-Proxy setzen (docs/HTTPS.md).
@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title=settings.app_name, version="2.2.0", lifespan=lifespan)
+app = FastAPI(title=settings.app_name, version="2.6.1", lifespan=lifespan)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -75,7 +75,7 @@ app.include_router(vault.router)
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"status": "ok", "app": settings.app_name, "version": "2.2.0"}
+    return {"status": "ok", "app": settings.app_name, "version": "2.6.1"}
 
 
 # Gebautes Frontend ausliefern (im Container unter ./frontend/dist).
