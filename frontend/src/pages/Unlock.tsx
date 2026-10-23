@@ -134,7 +134,7 @@ export function Unlock({ onUnlocked, busy, externalError }: Props) {
             )}
           </div>
         )}
-        <p className="app-version">v2.3.0</p>
+        <p className="app-version">v2.6.1</p>
       </form>
     </div>
   );
