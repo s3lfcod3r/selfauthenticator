@@ -7,7 +7,7 @@
 
 [![Build](https://github.com/s3lfcod3r/selfauthenticator/actions/workflows/docker.yml/badge.svg)](https://github.com/s3lfcod3r/selfauthenticator/actions/workflows/docker.yml)
 ![Version](https://img.shields.io/badge/version-2.6.1-33A78C)
-![License](https://img.shields.io/badge/license-private-8A9CAA)
+![License](https://img.shields.io/badge/license-All%20rights%20reserved-8A9CAA)
 ![Backend](https://img.shields.io/badge/backend-FastAPI-1F7763)
 ![Web](https://img.shields.io/badge/web-React%20PWA-43D3AD)
 ![App](https://img.shields.io/badge/android-planned-9DBDD0)
@@ -437,6 +437,26 @@ cd frontend && npm run typecheck && npm run build
 - [ ] Tests Richtung 80 % Abdeckung
 
 <p align="right"><a href="#-deutsch">⬆ nach oben</a></p>
+
+---
+
+## ⚖️ Lizenz / License
+
+**🇩🇪 Alle Rechte vorbehalten.** © 2026 s3lfcod3r / SelfCoder
+
+Du darfst die Software **privat und nicht-kommerziell** installieren und benutzen (z. B. im Homelab, über Docker oder Unraid).
+
+**Ohne schriftliche Erlaubnis verboten:** kommerzielle Nutzung · Kopieren · Verändern · Weitergeben · Einbauen in eigene Projekte (auch Closed Source) · Verkaufen.
+
+Details: [LICENSE](LICENSE)
+
+**🇬🇧 All rights reserved.** © 2026 s3lfcod3r / SelfCoder
+
+You may install and use the software **privately and non-commercially** (e.g. in your home lab, via Docker or Unraid).
+
+**Not permitted without written permission:** commercial use · copying · modifying · redistributing · incorporating into other projects (including closed source) · selling.
+
+Details: [LICENSE](LICENSE)
 
 ---
 
