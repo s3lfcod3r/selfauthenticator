@@ -325,6 +325,7 @@ export function VaultView({ session, entries, setEntries, onLock, failedCount = 
         </span>
         <div className="actions">
           <LangPicker className="lang-select" />
+          <button className="ghost" onClick={() => window.open("https://ko-fi.com/s3lfcod3r", "_blank", "noopener")} title="Ko-fi ☕ Unterstützen / Support" aria-label="Ko-fi">☕</button>
           <button className="ghost" onClick={() => setBackup(true)} title={t("Backup / Wiederherstellen")}>{t("Backup")}</button>
           <button className="ghost" onClick={onLock} title={t("Tresor sperren")}>{t("Sperren")}</button>
         </div>
