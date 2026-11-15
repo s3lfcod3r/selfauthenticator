@@ -5,17 +5,25 @@
   <Registry>https://github.com/s3lfcod3r/selfauthenticator/pkgs/container/selfauthenticator</Registry>
   <Project>https://github.com/s3lfcod3r/selfauthenticator</Project>
   <Support>https://github.com/s3lfcod3r/selfauthenticator/issues</Support>
-  <Overview>Self-hosted, zero-knowledge 2FA / TOTP vault - your own alternative to Synology Secure SignIn or Authy. Stores TOTP secrets end-to-end encrypted (Argon2id + XChaCha20-Poly1305); the server only ever sees ciphertext. Single Docker container with SQLite - no external database. The web UI is an installable PWA and the same API will back the upcoming Android app.</Overview>
-  <Category>Tools: Security: Network:Other</Category>
+  <Overview>Self-hosted, zero-knowledge 2FA / TOTP vault - your own alternative to Synology Secure SignIn or Authy. Stores TOTP secrets end-to-end encrypted (Argon2id + XChaCha20-Poly1305); the server only ever sees ciphertext. Single Docker container with SQLite - no external database. The web UI is an installable PWA.</Overview>
+  <Category>Security: Tools:</Category>
   <WebUI>http://[IP]:[PORT:8091]/</WebUI>
-  <TemplateURL>https://raw.githubusercontent.com/s3lfcod3r/selfauthenticator/main/unraid/selfauthenticator.xml</TemplateURL>
+  <TemplateURL>https://raw.githubusercontent.com/s3lfcod3r/unraid-templates/main/templates/selfauthenticator.xml</TemplateURL>
   <Icon>https://raw.githubusercontent.com/s3lfcod3r/selfauthenticator/main/assets/icon.png</Icon>
   <Network>bridge</Network>
+  <ReadMe>https://raw.githubusercontent.com/s3lfcod3r/selfauthenticator/main/README.md</ReadMe>
+  <License>Proprietary - free for private self-hosting, see project LICENSE</License>
+  <ExtraSearchTerms>2fa totp otp authenticator mfa two-factor vault pwa</ExtraSearchTerms>
+  <Requires>Set a long random Master Secret (min. 32 characters) before the first start. HTTPS via a reverse proxy is recommended: browsers only allow the QR camera scan, tap-to-copy and PWA offline mode over HTTPS (see docs/HTTPS.md in the project).</Requires>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
   <Shell>bash</Shell>
   <Privileged>false</Privileged>
-  <Config Name="Daten-Pfad" Target="/data" Default="/mnt/user/appdata/selfauthenticator/data" Mode="rw" Description="Path where the SQLite database (encrypted vault) is stored." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/selfauthenticator/data</Config>
+  <DonateText>EN: Like the project? Support it on Ko-fi ☕ — DE: Gefällt dir das Projekt? Unterstütze es auf Ko-fi ☕</DonateText>
+  <DonateLink>https://ko-fi.com/s3lfcod3r</DonateLink>
+  <Config Name="Data path" Target="/data" Default="/mnt/user/appdata/selfauthenticator/data" Mode="rw" Description="Path where the SQLite database (encrypted vault) is stored." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/selfauthenticator/data</Config>
   <Config Name="WebUI Port" Target="8091" Default="8091" Mode="tcp" Description="Port for the SelfAuthenticator web interface and API." Type="Port" Display="always" Required="true" Mask="false">8091</Config>
-  <Config Name="Master Secret" Target="SELFAUTH_SECRET" Default="" Mode="" Description="REQUIRED. Long random secret (min. 32 chars). Signs JWTs and derives the anti-enumeration salt. It does NOT encrypt your vault (that happens client-side). Generate with: python -c &quot;import secrets; print(secrets.token_hex(32))&quot;" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="Master Secret" Target="SELFAUTH_SECRET" Default="" Mode="" Description="REQUIRED. Long random secret (min. 32 chars). Signs JWTs and derives the anti-enumeration salt. It does NOT encrypt your vault (that happens client-side). Generate with: openssl rand -hex 32" Type="Variable" Display="always" Required="true" Mask="true"></Config>
   <Config Name="Allow Registration" Target="SELFAUTH_ALLOW_REGISTRATION" Default="true" Mode="" Description="Allow self-registration of new accounts. Set to false after creating your account to close the server." Type="Variable" Display="always" Required="false" Mask="false">true</Config>
+  <Config Name="Timezone" Target="TZ" Default="Europe/Berlin" Mode="" Description="Timezone of the container, e.g. Europe/Berlin." Type="Variable" Display="advanced" Required="false" Mask="false">Europe/Berlin</Config>
   <Config Name="DB Path" Target="SELFAUTH_DB_PATH" Default="/data/selfauthenticator.db" Mode="" Description="Path to SQLite database. Usually no need to change." Type="Variable" Display="advanced" Required="false" Mask="false">/data/selfauthenticator.db</Config>
 </Container>
