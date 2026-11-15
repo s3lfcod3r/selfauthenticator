@@ -110,7 +110,8 @@ Open `http://<host>:8091` → create the first account → then set `SELFAUTH_AL
 ### 📦 Unraid
 
 Add the template from
-`https://raw.githubusercontent.com/s3lfcod3r/selfauthenticator/main/unraid/selfauthenticator.xml`
+`https://raw.githubusercontent.com/s3lfcod3r/unraid-templates/main/templates/selfauthenticator.xml`
+(all my templates: [s3lfcod3r/unraid-templates](https://github.com/s3lfcod3r/unraid-templates))
 or import it under *Docker → Add Container → Template*. Set the **Master Secret**, leave the rest on defaults.
 
 > **⚠️ Permissions:** the container runs **non-root** (uid `99` / gid `100` = `nobody:users`). For an existing installation, fix the data folder once:
@@ -320,7 +321,8 @@ docker compose up -d
 ### 📦 Unraid
 
 Vorlage von
-`https://raw.githubusercontent.com/s3lfcod3r/selfauthenticator/main/unraid/selfauthenticator.xml`
+`https://raw.githubusercontent.com/s3lfcod3r/unraid-templates/main/templates/selfauthenticator.xml`
+(alle meine Vorlagen: [s3lfcod3r/unraid-templates](https://github.com/s3lfcod3r/unraid-templates))
 hinzufügen oder unter *Docker → Add Container → Template* importieren. **Master Secret** eintragen, den Rest auf Standard lassen.
 
 > **⚠️ Rechte:** der Container läuft **ohne Root** (uid `99` / gid `100` = `nobody:users`). Bei einer bestehenden Installation den Datenordner einmalig korrigieren:
